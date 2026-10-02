@@ -1,0 +1,89 @@
+.profil-technicien__retour {
+  display: inline-block;
+  margin-bottom: var(--space-4);
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.profil-technicien__grille {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .profil-technicien__grille {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profil-technicien__metier {
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: var(--space-1);
+}
+
+.profil-technicien__info {
+  color: var(--muted);
+  margin-top: var(--space-1);
+}
+
+.profil-technicien__bio {
+  margin-top: var(--space-4);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.profil-technicien__note {
+  color: var(--warn);
+  margin-top: var(--space-3);
+}
+
+.profil-technicien__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.profil-technicien__bouton {
+  display: block;
+  text-align: center;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--card);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.profil-technicien__bouton:hover {
+  background: var(--accent-hover);
+}
+
+.profil-technicien__bouton--secondaire {
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+}
+
+.profil-technicien__bouton--secondaire:hover {
+  background: var(--accent-soft);
+}
+
+.profil-technicien__avis {
+  margin-top: var(--space-4);
+}
+
+.profil-technicien__avis-item {
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--line);
+}
+
+.profil-technicien__avis-note {
+  color: var(--warn);
+}
+
+.profil-technicien__vide {
+  color: var(--muted);
+}
