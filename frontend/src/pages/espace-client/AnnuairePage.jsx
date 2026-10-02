@@ -1,26 +1,30 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Card } from '../../components/ui/Card.jsx'
 import './AnnuairePage.css'
 
 const TECHNICIENS = [
-  { id: 1, nom: 'Arnaud Moukala', metier: 'Plombier', ville: 'Brazzaville', entreprise: 'Plomberie Matsala', note: 5, avis: 1 },
-  { id: 2, nom: 'Grâce Nkounkou', metier: 'Électricienne', ville: 'Brazzaville', entreprise: 'Plomberie Matsala', note: 0, avis: 0 },
-  { id: 3, nom: 'Jean Mabiala', metier: 'Mécanicien', ville: 'Pointe-Noire', entreprise: 'Garage Mabiala', note: 4, avis: 3 },
+  { id: '1', slug: 'arnaud-moukala', nom: 'Arnaud Moukala', metier: 'Plombier', ville: 'Brazzaville', quartier: 'Bacongo', activite: { nom: 'Plomberie Matsala' }, noteMoyenne: 5, nbAvis: 1 },
+  { id: '2', slug: 'grace-nkounkou', nom: 'Grâce Nkounkou', metier: 'Électricienne', ville: 'Brazzaville', quartier: 'Moungali', activite: { nom: 'Plomberie Matsala' }, noteMoyenne: 0, nbAvis: 0 },
+  { id: '3', slug: 'jean-mabiala', nom: 'Jean Mabiala', metier: 'Mécanicien', ville: 'Pointe-Noire', quartier: 'Tié-Tié', activite: { nom: 'Garage Mabiala' }, noteMoyenne: 4, nbAvis: 3 },
 ]
 
 function TechnicienCard({ technicien }) {
-  const { nom, metier, ville, entreprise, note, avis } = technicien
+  const { slug, nom, metier, ville, quartier, activite, noteMoyenne, nbAvis } = technicien
+  const etoiles = Math.round(noteMoyenne)
   return (
-    <Card className="annuaire-carte">
-      <div className="annuaire-carte__nom">{nom}</div>
-      <div className="annuaire-carte__info">{metier}</div>
-      <div className="annuaire-carte__info">{ville}</div>
-      <div className="annuaire-carte__info">{entreprise}</div>
-      <div className="annuaire-carte__etoiles">
-        {'★'.repeat(note)}
-        {'☆'.repeat(5 - note)} {avis} avis
-      </div>
-    </Card>
+    <Link to={`/t/${slug}`} className="annuaire-lien">
+      <Card className="annuaire-carte">
+        <div className="annuaire-carte__nom">{nom}</div>
+        <div className="annuaire-carte__info">{metier}</div>
+        <div className="annuaire-carte__info">{quartier}, {ville}</div>
+        <div className="annuaire-carte__info">{activite.nom}</div>
+        <div className="annuaire-carte__etoiles">
+          {'★'.repeat(etoiles)}
+          {'☆'.repeat(5 - etoiles)} {nbAvis} avis
+        </div>
+      </Card>
+    </Link>
   )
 }
 
@@ -31,7 +35,7 @@ export default function AnnuairePage() {
   const villes = [...new Set(TECHNICIENS.map((t) => t.ville))]
 
   const resultats = TECHNICIENS.filter((t) => {
-    const texte = `${t.nom} ${t.metier} ${t.entreprise}`.toLowerCase()
+    const texte = `${t.nom} ${t.metier} ${t.activite.nom}`.toLowerCase()
     return texte.includes(recherche.toLowerCase()) && (ville === '' || t.ville === ville)
   })
 
