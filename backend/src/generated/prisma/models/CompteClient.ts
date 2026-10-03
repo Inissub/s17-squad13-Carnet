@@ -32,6 +32,9 @@ export type CompteClientMinAggregateOutputType = {
   ville: string | null
   motDePasseHash: string | null
   createdAt: Date | null
+  emailVerifieLe: Date | null
+  jetonActivationHash: string | null
+  jetonActivationExpire: Date | null
 }
 
 export type CompteClientMaxAggregateOutputType = {
@@ -42,6 +45,9 @@ export type CompteClientMaxAggregateOutputType = {
   ville: string | null
   motDePasseHash: string | null
   createdAt: Date | null
+  emailVerifieLe: Date | null
+  jetonActivationHash: string | null
+  jetonActivationExpire: Date | null
 }
 
 export type CompteClientCountAggregateOutputType = {
@@ -52,6 +58,9 @@ export type CompteClientCountAggregateOutputType = {
   ville: number
   motDePasseHash: number
   createdAt: number
+  emailVerifieLe: number
+  jetonActivationHash: number
+  jetonActivationExpire: number
   _all: number
 }
 
@@ -64,6 +73,9 @@ export type CompteClientMinAggregateInputType = {
   ville?: true
   motDePasseHash?: true
   createdAt?: true
+  emailVerifieLe?: true
+  jetonActivationHash?: true
+  jetonActivationExpire?: true
 }
 
 export type CompteClientMaxAggregateInputType = {
@@ -74,6 +86,9 @@ export type CompteClientMaxAggregateInputType = {
   ville?: true
   motDePasseHash?: true
   createdAt?: true
+  emailVerifieLe?: true
+  jetonActivationHash?: true
+  jetonActivationExpire?: true
 }
 
 export type CompteClientCountAggregateInputType = {
@@ -84,6 +99,9 @@ export type CompteClientCountAggregateInputType = {
   ville?: true
   motDePasseHash?: true
   createdAt?: true
+  emailVerifieLe?: true
+  jetonActivationHash?: true
+  jetonActivationExpire?: true
   _all?: true
 }
 
@@ -167,6 +185,9 @@ export type CompteClientGroupByOutputType = {
   ville: string | null
   motDePasseHash: string
   createdAt: Date
+  emailVerifieLe: Date | null
+  jetonActivationHash: string | null
+  jetonActivationExpire: Date | null
   _count: CompteClientCountAggregateOutputType | null
   _min: CompteClientMinAggregateOutputType | null
   _max: CompteClientMaxAggregateOutputType | null
@@ -198,6 +219,9 @@ export type CompteClientWhereInput = {
   ville?: Prisma.StringNullableFilter<"CompteClient"> | string | null
   motDePasseHash?: Prisma.StringFilter<"CompteClient"> | string
   createdAt?: Prisma.DateTimeFilter<"CompteClient"> | Date | string
+  emailVerifieLe?: Prisma.DateTimeNullableFilter<"CompteClient"> | Date | string | null
+  jetonActivationHash?: Prisma.StringNullableFilter<"CompteClient"> | string | null
+  jetonActivationExpire?: Prisma.DateTimeNullableFilter<"CompteClient"> | Date | string | null
   clients?: Prisma.ClientListRelationFilter
   avis?: Prisma.AvisListRelationFilter
 }
@@ -210,6 +234,9 @@ export type CompteClientOrderByWithRelationInput = {
   ville?: Prisma.SortOrderInput | Prisma.SortOrder
   motDePasseHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  emailVerifieLe?: Prisma.SortOrderInput | Prisma.SortOrder
+  jetonActivationHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  jetonActivationExpire?: Prisma.SortOrderInput | Prisma.SortOrder
   clients?: Prisma.ClientOrderByRelationAggregateInput
   avis?: Prisma.AvisOrderByRelationAggregateInput
 }
@@ -217,6 +244,7 @@ export type CompteClientOrderByWithRelationInput = {
 export type CompteClientWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   email?: string
+  jetonActivationHash?: string
   AND?: Prisma.CompteClientWhereInput | Prisma.CompteClientWhereInput[]
   OR?: Prisma.CompteClientWhereInput[]
   NOT?: Prisma.CompteClientWhereInput | Prisma.CompteClientWhereInput[]
@@ -225,9 +253,11 @@ export type CompteClientWhereUniqueInput = Prisma.AtLeast<{
   ville?: Prisma.StringNullableFilter<"CompteClient"> | string | null
   motDePasseHash?: Prisma.StringFilter<"CompteClient"> | string
   createdAt?: Prisma.DateTimeFilter<"CompteClient"> | Date | string
+  emailVerifieLe?: Prisma.DateTimeNullableFilter<"CompteClient"> | Date | string | null
+  jetonActivationExpire?: Prisma.DateTimeNullableFilter<"CompteClient"> | Date | string | null
   clients?: Prisma.ClientListRelationFilter
   avis?: Prisma.AvisListRelationFilter
-}, "id" | "email">
+}, "id" | "email" | "jetonActivationHash">
 
 export type CompteClientOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -237,6 +267,9 @@ export type CompteClientOrderByWithAggregationInput = {
   ville?: Prisma.SortOrderInput | Prisma.SortOrder
   motDePasseHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  emailVerifieLe?: Prisma.SortOrderInput | Prisma.SortOrder
+  jetonActivationHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  jetonActivationExpire?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.CompteClientCountOrderByAggregateInput
   _max?: Prisma.CompteClientMaxOrderByAggregateInput
   _min?: Prisma.CompteClientMinOrderByAggregateInput
@@ -253,6 +286,9 @@ export type CompteClientScalarWhereWithAggregatesInput = {
   ville?: Prisma.StringNullableWithAggregatesFilter<"CompteClient"> | string | null
   motDePasseHash?: Prisma.StringWithAggregatesFilter<"CompteClient"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"CompteClient"> | Date | string
+  emailVerifieLe?: Prisma.DateTimeNullableWithAggregatesFilter<"CompteClient"> | Date | string | null
+  jetonActivationHash?: Prisma.StringNullableWithAggregatesFilter<"CompteClient"> | string | null
+  jetonActivationExpire?: Prisma.DateTimeNullableWithAggregatesFilter<"CompteClient"> | Date | string | null
 }
 
 export type CompteClientCreateInput = {
@@ -263,6 +299,9 @@ export type CompteClientCreateInput = {
   ville?: string | null
   motDePasseHash: string
   createdAt?: Date | string
+  emailVerifieLe?: Date | string | null
+  jetonActivationHash?: string | null
+  jetonActivationExpire?: Date | string | null
   clients?: Prisma.ClientCreateNestedManyWithoutCompteClientInput
   avis?: Prisma.AvisCreateNestedManyWithoutCompteClientInput
 }
@@ -275,6 +314,9 @@ export type CompteClientUncheckedCreateInput = {
   ville?: string | null
   motDePasseHash: string
   createdAt?: Date | string
+  emailVerifieLe?: Date | string | null
+  jetonActivationHash?: string | null
+  jetonActivationExpire?: Date | string | null
   clients?: Prisma.ClientUncheckedCreateNestedManyWithoutCompteClientInput
   avis?: Prisma.AvisUncheckedCreateNestedManyWithoutCompteClientInput
 }
@@ -287,6 +329,9 @@ export type CompteClientUpdateInput = {
   ville?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   motDePasseHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerifieLe?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  jetonActivationHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jetonActivationExpire?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clients?: Prisma.ClientUpdateManyWithoutCompteClientNestedInput
   avis?: Prisma.AvisUpdateManyWithoutCompteClientNestedInput
 }
@@ -299,6 +344,9 @@ export type CompteClientUncheckedUpdateInput = {
   ville?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   motDePasseHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerifieLe?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  jetonActivationHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jetonActivationExpire?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clients?: Prisma.ClientUncheckedUpdateManyWithoutCompteClientNestedInput
   avis?: Prisma.AvisUncheckedUpdateManyWithoutCompteClientNestedInput
 }
@@ -311,6 +359,9 @@ export type CompteClientCreateManyInput = {
   ville?: string | null
   motDePasseHash: string
   createdAt?: Date | string
+  emailVerifieLe?: Date | string | null
+  jetonActivationHash?: string | null
+  jetonActivationExpire?: Date | string | null
 }
 
 export type CompteClientUpdateManyMutationInput = {
@@ -321,6 +372,9 @@ export type CompteClientUpdateManyMutationInput = {
   ville?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   motDePasseHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerifieLe?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  jetonActivationHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jetonActivationExpire?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type CompteClientUncheckedUpdateManyInput = {
@@ -331,6 +385,9 @@ export type CompteClientUncheckedUpdateManyInput = {
   ville?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   motDePasseHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerifieLe?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  jetonActivationHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jetonActivationExpire?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type CompteClientNullableScalarRelationFilter = {
@@ -346,6 +403,9 @@ export type CompteClientCountOrderByAggregateInput = {
   ville?: Prisma.SortOrder
   motDePasseHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  emailVerifieLe?: Prisma.SortOrder
+  jetonActivationHash?: Prisma.SortOrder
+  jetonActivationExpire?: Prisma.SortOrder
 }
 
 export type CompteClientMaxOrderByAggregateInput = {
@@ -356,6 +416,9 @@ export type CompteClientMaxOrderByAggregateInput = {
   ville?: Prisma.SortOrder
   motDePasseHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  emailVerifieLe?: Prisma.SortOrder
+  jetonActivationHash?: Prisma.SortOrder
+  jetonActivationExpire?: Prisma.SortOrder
 }
 
 export type CompteClientMinOrderByAggregateInput = {
@@ -366,6 +429,9 @@ export type CompteClientMinOrderByAggregateInput = {
   ville?: Prisma.SortOrder
   motDePasseHash?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  emailVerifieLe?: Prisma.SortOrder
+  jetonActivationHash?: Prisma.SortOrder
+  jetonActivationExpire?: Prisma.SortOrder
 }
 
 export type CompteClientScalarRelationFilter = {
@@ -411,6 +477,9 @@ export type CompteClientCreateWithoutClientsInput = {
   ville?: string | null
   motDePasseHash: string
   createdAt?: Date | string
+  emailVerifieLe?: Date | string | null
+  jetonActivationHash?: string | null
+  jetonActivationExpire?: Date | string | null
   avis?: Prisma.AvisCreateNestedManyWithoutCompteClientInput
 }
 
@@ -422,6 +491,9 @@ export type CompteClientUncheckedCreateWithoutClientsInput = {
   ville?: string | null
   motDePasseHash: string
   createdAt?: Date | string
+  emailVerifieLe?: Date | string | null
+  jetonActivationHash?: string | null
+  jetonActivationExpire?: Date | string | null
   avis?: Prisma.AvisUncheckedCreateNestedManyWithoutCompteClientInput
 }
 
@@ -449,6 +521,9 @@ export type CompteClientUpdateWithoutClientsInput = {
   ville?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   motDePasseHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerifieLe?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  jetonActivationHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jetonActivationExpire?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avis?: Prisma.AvisUpdateManyWithoutCompteClientNestedInput
 }
 
@@ -460,6 +535,9 @@ export type CompteClientUncheckedUpdateWithoutClientsInput = {
   ville?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   motDePasseHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerifieLe?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  jetonActivationHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jetonActivationExpire?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avis?: Prisma.AvisUncheckedUpdateManyWithoutCompteClientNestedInput
 }
 
@@ -471,6 +549,9 @@ export type CompteClientCreateWithoutAvisInput = {
   ville?: string | null
   motDePasseHash: string
   createdAt?: Date | string
+  emailVerifieLe?: Date | string | null
+  jetonActivationHash?: string | null
+  jetonActivationExpire?: Date | string | null
   clients?: Prisma.ClientCreateNestedManyWithoutCompteClientInput
 }
 
@@ -482,6 +563,9 @@ export type CompteClientUncheckedCreateWithoutAvisInput = {
   ville?: string | null
   motDePasseHash: string
   createdAt?: Date | string
+  emailVerifieLe?: Date | string | null
+  jetonActivationHash?: string | null
+  jetonActivationExpire?: Date | string | null
   clients?: Prisma.ClientUncheckedCreateNestedManyWithoutCompteClientInput
 }
 
@@ -509,6 +593,9 @@ export type CompteClientUpdateWithoutAvisInput = {
   ville?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   motDePasseHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerifieLe?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  jetonActivationHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jetonActivationExpire?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clients?: Prisma.ClientUpdateManyWithoutCompteClientNestedInput
 }
 
@@ -520,6 +607,9 @@ export type CompteClientUncheckedUpdateWithoutAvisInput = {
   ville?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   motDePasseHash?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerifieLe?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  jetonActivationHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jetonActivationExpire?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clients?: Prisma.ClientUncheckedUpdateManyWithoutCompteClientNestedInput
 }
 
@@ -571,6 +661,9 @@ export type CompteClientSelect<ExtArgs extends runtime.Types.Extensions.Internal
   ville?: boolean
   motDePasseHash?: boolean
   createdAt?: boolean
+  emailVerifieLe?: boolean
+  jetonActivationHash?: boolean
+  jetonActivationExpire?: boolean
   clients?: boolean | Prisma.CompteClient$clientsArgs<ExtArgs>
   avis?: boolean | Prisma.CompteClient$avisArgs<ExtArgs>
   _count?: boolean | Prisma.CompteClientCountOutputTypeDefaultArgs<ExtArgs>
@@ -584,6 +677,9 @@ export type CompteClientSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   ville?: boolean
   motDePasseHash?: boolean
   createdAt?: boolean
+  emailVerifieLe?: boolean
+  jetonActivationHash?: boolean
+  jetonActivationExpire?: boolean
 }, ExtArgs["result"]["compteClient"]>
 
 export type CompteClientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -594,6 +690,9 @@ export type CompteClientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   ville?: boolean
   motDePasseHash?: boolean
   createdAt?: boolean
+  emailVerifieLe?: boolean
+  jetonActivationHash?: boolean
+  jetonActivationExpire?: boolean
 }, ExtArgs["result"]["compteClient"]>
 
 export type CompteClientSelectScalar = {
@@ -604,9 +703,12 @@ export type CompteClientSelectScalar = {
   ville?: boolean
   motDePasseHash?: boolean
   createdAt?: boolean
+  emailVerifieLe?: boolean
+  jetonActivationHash?: boolean
+  jetonActivationExpire?: boolean
 }
 
-export type CompteClientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nom" | "email" | "telephone" | "ville" | "motDePasseHash" | "createdAt", ExtArgs["result"]["compteClient"]>
+export type CompteClientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nom" | "email" | "telephone" | "ville" | "motDePasseHash" | "createdAt" | "emailVerifieLe" | "jetonActivationHash" | "jetonActivationExpire", ExtArgs["result"]["compteClient"]>
 export type CompteClientInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clients?: boolean | Prisma.CompteClient$clientsArgs<ExtArgs>
   avis?: boolean | Prisma.CompteClient$avisArgs<ExtArgs>
@@ -629,6 +731,9 @@ export type $CompteClientPayload<ExtArgs extends runtime.Types.Extensions.Intern
     ville: string | null
     motDePasseHash: string
     createdAt: Date
+    emailVerifieLe: Date | null
+    jetonActivationHash: string | null
+    jetonActivationExpire: Date | null
   }, ExtArgs["result"]["compteClient"]>
   composites: {}
 }
@@ -1061,6 +1166,9 @@ export interface CompteClientFieldRefs {
   readonly ville: Prisma.FieldRef<"CompteClient", 'String'>
   readonly motDePasseHash: Prisma.FieldRef<"CompteClient", 'String'>
   readonly createdAt: Prisma.FieldRef<"CompteClient", 'DateTime'>
+  readonly emailVerifieLe: Prisma.FieldRef<"CompteClient", 'DateTime'>
+  readonly jetonActivationHash: Prisma.FieldRef<"CompteClient", 'String'>
+  readonly jetonActivationExpire: Prisma.FieldRef<"CompteClient", 'DateTime'>
 }
     
 

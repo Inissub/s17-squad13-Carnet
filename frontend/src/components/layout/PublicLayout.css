@@ -35,6 +35,10 @@
   color: var(--ink);
 }
 
+.public-header__nav .public-header__mobile {
+  display: none;
+}
+
 .public-main {
   flex: 1;
 }
@@ -48,5 +52,23 @@
 @media (max-width: 760px) {
   .public-header__link {
     display: none;
+  }
+
+  /* L'accès à l'annuaire reste visible sur mobile */
+  .public-header__link--essentiel {
+    display: inline;
+  }
+
+  /* Sur mobile, « Connexion » remplace « Créer un compte » */
+  .public-header__nav .public-header__bureau {
+    display: none;
+  }
+
+  .public-header__nav .public-header__mobile {
+    display: inline-flex;
+  }
+
+  .public-header__nav {
+    gap: var(--space-3);
   }
 }

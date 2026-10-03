@@ -41,6 +41,31 @@
   color: var(--muted);
 }
 
+.auth__note--erreur {
+  color: var(--err);
+}
+
+.auth__renvoi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.auth__renvoi .auth__note {
+  margin-top: 0;
+}
+
+.auth__boite {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
 .auth__footer {
   font-size: 13px;
   color: var(--muted);

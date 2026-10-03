@@ -1,19 +1,23 @@
+import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import { Router } from "express";
 import { z } from "zod";
+import { env } from "../../config/env.js";
 import { prisma } from "../../db/prisma.js";
 import { requireAuth } from "../../middleware/auth.js";
 import { HttpError } from "../../utils/httpError.js";
+import { envoyerMail, mailActivation } from "../../utils/mail.js";
 import { fermerSession, ouvrirSession } from "../../utils/session.js";
 
 export const authRouter = Router();
 
 const texte = (min, message) => z.string().trim().min(min, message);
 const optionnel = z.preprocess((v) => (v === "" ? undefined : v), z.string().trim().optional());
+const email = z.string().trim().toLowerCase().email("E-mail invalide");
 
 const commun = {
   nom: texte(2, "Nom trop court"),
-  email: z.string().trim().toLowerCase().email("E-mail invalide"),
+  email,
   motDePasse: z.string().min(8, "Le mot de passe doit faire au moins 8 caractères"),
   telephone: optionnel,
   ville: optionnel,
@@ -30,10 +34,9 @@ const inscriptionSchema = z.discriminatedUnion("type", [
   }),
 ]);
 
-const connexionSchema = z.object({
-  email: z.string().trim().toLowerCase().email("E-mail invalide"),
-  motDePasse: z.string().min(1, "Mot de passe requis"),
-});
+const connexionSchema = z.object({ email, motDePasse: z.string().min(1, "Mot de passe requis") });
+const activationSchema = z.object({ jeton: z.string().min(1, "Lien d'activation invalide") });
+const renvoiSchema = z.object({ email });
 
 // Contenu de la session, lu par requireAuth et exposé dans req.user.
 // Les clients ont le rôle CLIENT et pas d'activiteId.
@@ -61,27 +64,66 @@ async function profil(session) {
   return { type: "pro", ...rest };
 }
 
-async function emailPris(email) {
+async function emailPris(adresse) {
   const [user, compte] = await Promise.all([
-    prisma.utilisateur.findUnique({ where: { email }, select: { id: true } }),
-    prisma.compteClient.findUnique({ where: { email }, select: { id: true } }),
+    prisma.utilisateur.findUnique({ where: { email: adresse }, select: { id: true } }),
+    prisma.compteClient.findUnique({ where: { email: adresse }, select: { id: true } }),
   ]);
   return Boolean(user || compte);
 }
+
+// ——— Activation par e-mail ———
+// Seule l'empreinte SHA-256 du jeton est stockée : une fuite de la base ne permet pas d'activer un compte.
+
+const VALIDITE_HEURES = 24;
+const empreinte = (jeton) => crypto.createHash("sha256").update(jeton).digest("hex");
+
+function nouveauJeton() {
+  const jeton = crypto.randomBytes(32).toString("base64url");
+  return {
+    jeton,
+    data: {
+      jetonActivationHash: empreinte(jeton),
+      jetonActivationExpire: new Date(Date.now() + VALIDITE_HEURES * 3600 * 1000),
+    },
+  };
+}
+
+async function envoyerActivation({ nom, email: destinataire }, jeton) {
+  const lien = `${env.CLIENT_URL}/activation?jeton=${jeton}`;
+  try {
+    await envoyerMail({ to: destinataire, ...mailActivation({ nom, lien, heures: VALIDITE_HEURES }) });
+  } catch (err) {
+    // Le compte existe déjà : l'utilisateur pourra redemander le lien depuis l'écran de connexion
+    console.error("Envoi du mail d'activation impossible :", err.message);
+  }
+}
+
+// Cherche un compte non activé, professionnel ou client
+async function compteNonActive(where) {
+  const user = await prisma.utilisateur.findFirst({ where: { ...where, emailVerifieLe: null } });
+  if (user) return { compte: user, modele: prisma.utilisateur, session: sessionPro };
+  const client = await prisma.compteClient.findFirst({ where: { ...where, emailVerifieLe: null } });
+  if (client) return { compte: client, modele: prisma.compteClient, session: sessionClient };
+  return null;
+}
+
+// ——— Routes ———
 
 authRouter.post("/inscription", async (req, res) => {
   const data = inscriptionSchema.parse(req.body);
   if (await emailPris(data.email)) throw new HttpError(409, "Un compte existe déjà avec cet e-mail");
 
   const motDePasseHash = await bcrypt.hash(data.motDePasse, 12);
-  const { nom, email, telephone, ville } = data;
+  const { nom, telephone, ville } = data;
+  const { jeton, data: activation } = nouveauJeton();
 
-  let session;
   if (data.type === "client") {
-    const compte = await prisma.compteClient.create({ data: { nom, email, telephone, ville, motDePasseHash } });
-    session = sessionClient(compte);
+    await prisma.compteClient.create({
+      data: { nom, email: data.email, telephone, ville, motDePasseHash, ...activation },
+    });
   } else {
-    const activite = await prisma.activite.create({
+    await prisma.activite.create({
       data: {
         nom: data.nomActivite,
         telephone,
@@ -89,40 +131,76 @@ authRouter.post("/inscription", async (req, res) => {
         utilisateurs: {
           create: {
             nom,
-            email,
+            email: data.email,
             motDePasseHash,
             role: "RESPONSABLE",
             metier: data.metier,
             ville,
             telephone,
             whatsapp: telephone,
+            ...activation,
           },
         },
       },
-      select: { utilisateurs: { select: { id: true, activiteId: true, role: true } } },
     });
-    session = sessionPro(activite.utilisateurs[0]);
   }
 
-  ouvrirSession(res, session);
-  res.status(201).json(await profil(session));
+  // Pas de session ici : le compte doit d'abord être activé via le lien envoyé par e-mail
+  await envoyerActivation({ nom, email: data.email }, jeton);
+  res.status(201).json({ email: data.email });
 });
 
 // Un seul formulaire pour les deux types de comptes : on cherche d'abord un professionnel, puis un client
 authRouter.post("/connexion", async (req, res) => {
-  const { email, motDePasse } = connexionSchema.parse(req.body);
+  const { email: adresse, motDePasse } = connexionSchema.parse(req.body);
 
-  const user = await prisma.utilisateur.findUnique({ where: { email } });
-  const compte = user ? null : await prisma.compteClient.findUnique({ where: { email } });
+  const user = await prisma.utilisateur.findUnique({ where: { email: adresse } });
+  const compte = user ? null : await prisma.compteClient.findUnique({ where: { email: adresse } });
   const trouve = user ?? compte;
 
   const valide = trouve && (await bcrypt.compare(motDePasse, trouve.motDePasseHash));
   if (!valide) throw new HttpError(401, "E-mail ou mot de passe incorrect");
+  if (!trouve.emailVerifieLe) {
+    throw new HttpError(403, "Activez votre compte avec le lien reçu par e-mail.", "EMAIL_NON_VERIFIE");
+  }
   if (user && !user.actif) throw new HttpError(403, "Ce compte est désactivé");
 
   const session = user ? sessionPro(user) : sessionClient(compte);
   ouvrirSession(res, session);
   res.json(await profil(session));
+});
+
+// Ouverture du lien reçu par e-mail : active le compte et connecte directement l'utilisateur
+authRouter.post("/activation", async (req, res) => {
+  const { jeton } = activationSchema.parse(req.body);
+
+  const trouve = await compteNonActive({ jetonActivationHash: empreinte(jeton) });
+  if (!trouve || trouve.compte.jetonActivationExpire < new Date()) {
+    throw new HttpError(400, "Ce lien d'activation est invalide ou a expiré.", "JETON_INVALIDE");
+  }
+
+  const { compte, modele, session } = trouve;
+  await modele.update({
+    where: { id: compte.id },
+    data: { emailVerifieLe: new Date(), jetonActivationHash: null, jetonActivationExpire: null },
+  });
+
+  ouvrirSession(res, session(compte));
+  res.json(await profil(session(compte)));
+});
+
+// Réponse identique que le compte existe ou non, pour ne pas révéler quels e-mails sont inscrits
+authRouter.post("/activation/renvoyer", async (req, res) => {
+  const { email: adresse } = renvoiSchema.parse(req.body);
+
+  const trouve = await compteNonActive({ email: adresse });
+  if (trouve) {
+    const { jeton, data } = nouveauJeton();
+    await trouve.modele.update({ where: { id: trouve.compte.id }, data });
+    await envoyerActivation(trouve.compte, jeton);
+  }
+
+  res.json({ message: "Si un compte non activé existe pour cette adresse, un nouveau lien vient d'être envoyé." });
 });
 
 authRouter.post("/deconnexion", (req, res) => {

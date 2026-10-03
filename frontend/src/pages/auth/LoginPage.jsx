@@ -5,13 +5,14 @@ import { Button } from '../../components/ui/Button.jsx'
 import { Input } from '../../components/ui/Input.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { espaceDe } from './espace.js'
+import { RenvoyerActivation } from './RenvoyerActivation.jsx'
 import './Auth.css'
 
 export default function LoginPage() {
   const { user, login } = useAuth()
   const [searchParams] = useSearchParams()
   const [form, setForm] = useState({ email: '', motDePasse: '' })
-  const [erreur, setErreur] = useState('')
+  const [erreur, setErreur] = useState(null)
   const [envoi, setEnvoi] = useState(false)
 
   // Une fois connecté, user est rempli et on redirige vers l'espace du compte
@@ -21,12 +22,12 @@ export default function LoginPage() {
 
   async function soumettre(e) {
     e.preventDefault()
-    setErreur('')
+    setErreur(null)
     setEnvoi(true)
     try {
       await login(form.email, form.motDePasse)
     } catch (err) {
-      setErreur(err.message)
+      setErreur({ message: err.message, code: err.data?.code })
       setEnvoi(false)
     }
   }
@@ -42,9 +43,10 @@ export default function LoginPage() {
         <form className="auth__form" onSubmit={soumettre}>
           {erreur && (
             <p className="auth__error" role="alert">
-              {erreur}
+              {erreur.message}
             </p>
           )}
+          {erreur?.code === 'EMAIL_NON_VERIFIE' && <RenvoyerActivation email={form.email} />}
           <Input label="Email" type="email" name="email" autoComplete="email" required value={form.email} onChange={changer} />
           <Input
             label="Mot de passe"

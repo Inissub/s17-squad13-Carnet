@@ -6,6 +6,7 @@ import { Input } from '../../components/ui/Input.jsx'
 import { Select } from '../../components/ui/Select.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { espaceDe } from './espace.js'
+import { RenvoyerActivation } from './RenvoyerActivation.jsx'
 import './Auth.css'
 
 const VILLES = ['Brazzaville', 'Pointe-Noire', 'Dolisie', 'Nkayi', 'Ouesso', 'Owando', 'Impfondo', 'Madingou', 'Sibiti', 'Kinkala']
@@ -33,6 +34,31 @@ const TYPES = {
   },
 }
 
+function VerifierBoite({ email }) {
+  return (
+    <AuthLayout>
+      <div className="auth">
+        <div>
+          <div className="auth__boite" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="m3 7 9 6 9-6" />
+            </svg>
+          </div>
+          <h1 className="auth__title">Vérifiez votre boîte mail</h1>
+          <p className="auth__intro">
+            Nous avons envoyé un lien d’activation à <strong>{email}</strong>. Ouvrez-le pour activer votre compte : il est valable 24 heures.
+          </p>
+        </div>
+        <RenvoyerActivation email={email} />
+        <p className="auth__footer">
+          Pensez à regarder dans vos spams. Compte déjà activé ? <Link to="/connexion">Se connecter</Link>
+        </p>
+      </div>
+    </AuthLayout>
+  )
+}
+
 const VIDE = { nom: '', nomActivite: '', metier: '', telephone: '', ville: VILLES[0], devise: DEVISES[0], email: '', motDePasse: '' }
 
 export default function RegisterPage() {
@@ -41,11 +67,13 @@ export default function RegisterPage() {
   const [form, setForm] = useState(VIDE)
   const [erreur, setErreur] = useState('')
   const [envoi, setEnvoi] = useState(false)
+  const [inscrit, setInscrit] = useState(null)
 
   const type = searchParams.get('type') === 'pro' ? 'pro' : 'client'
   const config = TYPES[type]
 
   if (user) return <Navigate to={espaceDe(user)} replace />
+  if (inscrit) return <VerifierBoite email={inscrit} />
 
   const changer = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
 
@@ -60,7 +88,8 @@ export default function RegisterPage() {
     setEnvoi(true)
     const { nomActivite, metier, devise, ...commun } = form
     try {
-      await register(type === 'pro' ? { type, ...commun, nomActivite, metier, devise } : { type, ...commun })
+      const { email } = await register(type === 'pro' ? { type, ...commun, nomActivite, metier, devise } : { type, ...commun })
+      setInscrit(email)
     } catch (err) {
       setErreur(err.data?.details?.[0]?.message ?? err.message)
       setEnvoi(false)
