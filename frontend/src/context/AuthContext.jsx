@@ -26,9 +26,18 @@ export function AuthProvider({ children }) {
     await refresh()
   }
 
-  async function register(data) {
-    await api.post('/auth/inscription', data)
+  // L'inscription n'ouvre pas de session : le compte doit d'abord être activé via le lien reçu par e-mail
+  function register(data) {
+    return api.post('/auth/inscription', data)
+  }
+
+  async function activate(jeton) {
+    await api.post('/auth/activation', { jeton })
     await refresh()
+  }
+
+  function resendActivation(email) {
+    return api.post('/auth/activation/renvoyer', { email })
   }
 
   async function logout() {
@@ -37,7 +46,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refresh }}>
+    <AuthContext.Provider value={{ user, loading, login, register, activate, resendActivation, logout, refresh }}>
       {children}
     </AuthContext.Provider>
   )

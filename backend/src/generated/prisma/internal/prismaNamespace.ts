@@ -1605,6 +1605,9 @@ export const UtilisateurScalarFieldEnum = {
   role: 'role',
   actif: 'actif',
   createdAt: 'createdAt',
+  emailVerifieLe: 'emailVerifieLe',
+  jetonActivationHash: 'jetonActivationHash',
+  jetonActivationExpire: 'jetonActivationExpire',
   profilPublic: 'profilPublic',
   slug: 'slug',
   metier: 'metier',
@@ -1792,7 +1795,10 @@ export const CompteClientScalarFieldEnum = {
   telephone: 'telephone',
   ville: 'ville',
   motDePasseHash: 'motDePasseHash',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  emailVerifieLe: 'emailVerifieLe',
+  jetonActivationHash: 'jetonActivationHash',
+  jetonActivationExpire: 'jetonActivationExpire'
 } as const
 
 export type CompteClientScalarFieldEnum = (typeof CompteClientScalarFieldEnum)[keyof typeof CompteClientScalarFieldEnum]

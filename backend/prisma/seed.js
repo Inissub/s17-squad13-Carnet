@@ -46,6 +46,7 @@ async function main() {
       nom: "Jean-Claude Mabiala",
       email: EMAIL_RESPONSABLE,
       motDePasseHash: hash,
+      emailVerifieLe: new Date(),
       role: "RESPONSABLE",
       telephone: "+242 06 612 34 56",
     },
@@ -57,6 +58,7 @@ async function main() {
       nom: "Grâce Nkounkou",
       email: "grace@carnet.test",
       motDePasseHash: hash,
+      emailVerifieLe: new Date(),
       role: "TECHNICIEN",
       profilPublic: true,
       slug: "grace-nkounkou",
@@ -75,6 +77,7 @@ async function main() {
       nom: "Arnaud Moukala",
       email: "arnaud@carnet.test",
       motDePasseHash: hash,
+      emailVerifieLe: new Date(),
       role: "TECHNICIEN",
       profilPublic: true,
       slug: "arnaud-moukala",
@@ -88,10 +91,10 @@ async function main() {
   });
 
   const mireille = await prisma.compteClient.create({
-    data: { nom: "Mireille Ngoma", email: EMAILS_CLIENTS[0], telephone: "+242 06 401 22 18", ville: "Brazzaville", motDePasseHash: hash },
+    data: { nom: "Mireille Ngoma", email: EMAILS_CLIENTS[0], telephone: "+242 06 401 22 18", ville: "Brazzaville", motDePasseHash: hash, emailVerifieLe: new Date() },
   });
   const christian = await prisma.compteClient.create({
-    data: { nom: "Christian Loubaki", email: EMAILS_CLIENTS[1], telephone: "+242 06 955 43 21", ville: "Brazzaville", motDePasseHash: hash },
+    data: { nom: "Christian Loubaki", email: EMAILS_CLIENTS[1], telephone: "+242 06 955 43 21", ville: "Brazzaville", motDePasseHash: hash, emailVerifieLe: new Date() },
   });
 
   const fichesClients = [
