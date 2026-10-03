@@ -1,0 +1,122 @@
+.dashboard-page__header {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.dashboard-page__date {
+  text-transform: capitalize;
+}
+
+.dashboard-page__hint {
+  font-size: 13px;
+}
+
+.dashboard-page__scope {
+  font-size: 13px;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.dashboard-table th {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid var(--line);
+}
+
+.dashboard-table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.dashboard-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: var(--space-4);
+}
+
+.dashboard-stats__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dashboard-stats__value {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.dashboard-stats__label {
+  font-size: 12px;
+}
+
+.dashboard-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  list-style: none;
+}
+
+.dashboard-timeline__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.dashboard-timeline__item:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.dashboard-timeline__badges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.dashboard-timeline__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dashboard-timeline__meta {
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .dashboard-timeline__item {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
