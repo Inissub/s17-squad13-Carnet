@@ -16,7 +16,7 @@ export function errorHandler(err, req, res, next) {
     return res.status(400).json({ message });
   }
   if (err instanceof HttpError) {
-    return res.status(err.status).json({ message: err.message });
+    return res.status(err.status).json({ message: err.message, code: err.code });
   }
   console.error(err);
   res.status(500).json({ message: "Erreur serveur" });

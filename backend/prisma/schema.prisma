@@ -93,6 +93,11 @@ model Utilisateur {
   actif          Boolean  @default(true)
   createdAt      DateTime @default(now())
 
+  // Activation du compte par e-mail : null tant que le lien n'a pas été ouvert
+  emailVerifieLe        DateTime?
+  jetonActivationHash   String?   @unique
+  jetonActivationExpire DateTime?
+
   profilPublic Boolean @default(false)
   slug         String? @unique
   metier       String?
@@ -320,6 +325,10 @@ model CompteClient {
   ville          String?
   motDePasseHash String
   createdAt      DateTime @default(now())
+
+  emailVerifieLe        DateTime?
+  jetonActivationHash   String?   @unique
+  jetonActivationExpire DateTime?
 
   clients Client[]
   avis    Avis[]

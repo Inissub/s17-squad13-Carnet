@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import { DashboardLayout } from './components/layout/DashboardLayout.jsx'
 import { ProtectedRoute } from './components/layout/ProtectedRoute.jsx'
 import { PublicLayout } from './components/layout/PublicLayout.jsx'
+import ActivationPage from './pages/auth/ActivationPage.jsx'
 import LoginPage from './pages/auth/LoginPage.jsx'
 import RegisterPage from './pages/auth/RegisterPage.jsx'
 import ClientDetailPage from './pages/clients/ClientDetailPage.jsx'
@@ -29,6 +30,7 @@ export default function App() {
       </Route>
 
       <Route path="/connexion" element={<LoginPage />} />
+      <Route path="/activation" element={<ActivationPage />} />
       <Route path="/inscription" element={<RegisterPage />} />
 
       <Route element={<ProtectedRoute />}>
