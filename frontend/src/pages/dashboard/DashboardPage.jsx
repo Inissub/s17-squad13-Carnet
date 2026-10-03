@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from '../../components/ui/Badge.jsx'
 import { Card } from '../../components/ui/Card.jsx'
 import { useFetch } from '../../hooks/useFetch.js'
+import { useAuth } from '../../context/AuthContext.jsx'
 import { formatDateHeure, formatMontant } from '../../utils/format.js'
 import { STATUT_LABELS, STATUT_TONES, STATUT_ORDRE } from '../../utils/intervention.js'
 import '../../styles/DashboardPage.css'
