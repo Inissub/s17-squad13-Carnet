@@ -1,0 +1,70 @@
+.clients-search {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 340px;
+    max-width: 100%;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--muted);
+}
+
+.clients-search:focus-within {
+    border-color: var(--accent);
+}
+
+.clients-search input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--ink);
+}
+
+.clients-table-wrap {
+    overflow-x: auto;
+}
+
+.clients-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.clients-table th {
+    padding: var(--space-3) var(--space-4);
+    font-weight: 500;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+}
+
+.clients-table td {
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+}
+
+.clients-table tbody tr {
+    cursor: pointer;
+}
+
+.clients-table tbody tr:hover {
+    background: var(--bg);
+}
+
+.clients-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.clients-table__nom {
+    font-weight: 600;
+}
+
+.clients-empty {
+    padding: var(--space-5) var(--space-4);
+}

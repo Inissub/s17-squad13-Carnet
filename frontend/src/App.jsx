@@ -18,6 +18,7 @@ import LandingPage from './pages/landing/LandingPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import ProfilActivitePage from './pages/profil-activite/ProfilActivitePage.jsx'
 import ProfilPublicPage from './pages/profil-public/ProfilPublicPage.jsx'
+import ArchivesPage from './pages/clients/ArchivesPage.jsx'
 
 export default function App() {
   return (
@@ -39,6 +40,7 @@ export default function App() {
           <Route path="interventions" element={<InterventionsPage />} />
           <Route path="interventions/:id" element={<InterventionDetailPage />} />
           <Route path="clients" element={<ClientsPage />} />
+          <Route path="clients/archives" element={<ArchivesPage />} />
           <Route path="clients/:id" element={<ClientDetailPage />} />
           <Route path="facturation" element={<FacturationPage />} />
           <Route path="profil-public" element={<ProfilPublicPage />} />
