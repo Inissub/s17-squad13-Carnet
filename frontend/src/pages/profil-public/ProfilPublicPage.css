@@ -1,0 +1,96 @@
+.profil-public__formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.profil-public__grille {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+@media (max-width: 800px) {
+  .profil-public__grille {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profil-public__champ {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.profil-public__label {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.profil-public__aide {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.profil-public__saisie {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}
+
+.profil-public__saisie--long {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.profil-public__visibilite {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+}
+
+.profil-public__bouton {
+  align-self: flex-start;
+  padding: var(--space-3) var(--space-5);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--card);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profil-public__bouton:hover {
+  background: var(--accent-hover);
+}
+
+.profil-public__bouton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.profil-public__message {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+}
+
+.profil-public__message--ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.profil-public__message--erreur {
+  background: var(--err-soft);
+  color: var(--err);
+}
+
+.profil-public__lien {
+  margin-top: var(--space-4);
+  color: var(--accent);
+  font-weight: 600;
+}
