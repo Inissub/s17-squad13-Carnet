@@ -1,8 +1,10 @@
+import { ClientsListe } from './ClientsListe.jsx'
+
 export default function ClientsPage() {
   return (
-    <div className="page-placeholder">
-      <h1 className="page-title">Clients</h1>
-      <p className="muted">Page à construire — Steven KILONDA</p>
+    <div className="stack">
+      <h1 className="page-title">Tous les clients</h1>
+      <ClientsListe archive={false} />
     </div>
   )
 }
