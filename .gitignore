@@ -65,6 +65,9 @@ web_modules/
 # Yarn Integrity file
 .yarn-integrity
 
+# Fichiers envoyés en développement (stockage local quand R2 n'est pas configuré)
+backend/uploads/
+
 # dotenv environment variable files
 .env
 .env.*

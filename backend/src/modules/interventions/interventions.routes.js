@@ -2,7 +2,10 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../../db/prisma.js";
 import { requireRole } from "../../middleware/auth.js";
-import { HttpError, notFound } from "../../utils/httpError.js";
+import { HttpError } from "../../utils/httpError.js";
+import { perimetre, trouverIntervention } from "./acces.js";
+import { detailRouter } from "./detail.routes.js";
+import { prochaineReference } from "./references.js";
 
 export const interventionsRouter = Router();
 
@@ -56,15 +59,6 @@ const selectListe = {
   client: { select: { id: true, nom: true } },
   technicien: { select: { id: true, nom: true } },
 };
-
-// Un technicien n'a accès qu'aux interventions qui lui sont attribuées
-const perimetre = ({ id, activiteId, role }) => ({ activiteId, ...(role === "TECHNICIEN" && { technicienId: id }) });
-
-async function trouverIntervention(tx, user, id) {
-  const intervention = await tx.intervention.findFirst({ where: { id, ...perimetre(user) } });
-  if (!intervention) throw notFound("Intervention");
-  return intervention;
-}
 
 // Fiche client de l'activité à utiliser ; un compte inscrit reçoit sa fiche au premier travail
 async function resoudreClient(tx, activiteId, data, clientActuelId) {
@@ -135,15 +129,6 @@ interventionsRouter.get("/", async (req, res) => {
   });
 });
 
-interventionsRouter.get("/:id", async (req, res) => {
-  const intervention = await prisma.intervention.findFirst({
-    where: { id: req.params.id, ...perimetre(req.user) },
-    select: { ...selectListe, description: true, dureeMinutes: true },
-  });
-  if (!intervention) throw notFound("Intervention");
-  res.json(intervention);
-});
-
 interventionsRouter.post("/", async (req, res) => {
   const { id: utilisateurId, activiteId } = req.user;
   const data = creationSchema.parse(req.body);
@@ -152,18 +137,11 @@ interventionsRouter.post("/", async (req, res) => {
     const client = await resoudreClient(tx, activiteId, data);
     await verifierTechnicien(tx, activiteId, data.technicienId);
 
-    const annee = new Date().getFullYear();
-    const { valeur } = await tx.compteur.upsert({
-      where: { activiteId_type_annee: { activiteId, type: "INTERVENTION", annee } },
-      create: { activiteId, type: "INTERVENTION", annee, valeur: 1 },
-      update: { valeur: { increment: 1 } },
-    });
-
     const statut = data.statut ?? (data.datePrevue ? "PLANIFIEE" : "A_PLANIFIER");
     return tx.intervention.create({
       data: {
         activiteId,
-        reference: `INT-${annee}-${String(valeur).padStart(4, "0")}`,
+        reference: await prochaineReference(tx, activiteId, "INTERVENTION"),
         clientId: client.id,
         technicienId: data.technicienId ?? null,
         objet: data.objet,
@@ -226,3 +204,6 @@ interventionsRouter.delete("/:id", requireRole("RESPONSABLE"), async (req, res) 
   await prisma.intervention.delete({ where: { id: intervention.id } });
   res.status(204).end();
 });
+
+// Fiche détaillée et suivi : rapport, statut, validation, pièces jointes
+interventionsRouter.use("/:id", detailRouter);

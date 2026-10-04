@@ -7,6 +7,7 @@ import { Select } from '../../components/ui/Select.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useFetch } from '../../hooks/useFetch.js'
 import { PRIORITES, STATUTS } from '../../utils/interventions.js'
+import './FormulaireIntervention.css'
 
 const VIDE = {
   client: '',

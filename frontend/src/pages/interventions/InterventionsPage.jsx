@@ -6,12 +6,11 @@ import { Button } from '../../components/ui/Button.jsx'
 import { Card } from '../../components/ui/Card.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useFetch } from '../../hooks/useFetch.js'
+import { formatJourHeure } from '../../utils/format.js'
 import { PRIORITES, STATUTS, getStatut } from '../../utils/interventions.js'
 import { FormulaireIntervention } from './FormulaireIntervention.jsx'
 import './InterventionsPage.css'
 
-// « 30 sept., 09:00 »
-const dateHeure = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
 const TAILLE_PAGE = 20
 
@@ -287,7 +286,7 @@ export default function InterventionsPage() {
                     <tr key={i.id}>
                       <td className="interventions__date">
                         {date ? (
-                          dateHeure.format(date)
+                          formatJourHeure(date)
                         ) : (
                           <span className="muted">Non planifiée</span>
                         )}
@@ -318,6 +317,17 @@ export default function InterventionsPage() {
                         </Link>
                       </td>
                       <td className="interventions__actions">
+                        <Link
+                          to={`/dashboard/interventions/${i.id}`}
+                          className="interventions__action"
+                          aria-label={`Voir l'intervention ${i.reference}`}
+                          title="Voir"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                        </Link>
                         <button
                           type="button"
                           className="interventions__action"

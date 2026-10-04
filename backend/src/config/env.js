@@ -34,7 +34,7 @@ export const env = result.data;
 
 export const stockageActif = Boolean(env.R2_ACCOUNT_ID && env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY);
 if (!stockageActif) {
-  console.warn("Stockage R2 non configuré (R2_* dans .env) : les envois de fichiers sont désactivés.");
+  console.warn("Stockage R2 non configuré (R2_* dans .env) : les fichiers sont enregistrés dans backend/uploads.");
 }
 
 export const mailActif = Boolean(env.SMTP_HOST);
