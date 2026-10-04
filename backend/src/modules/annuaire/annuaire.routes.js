@@ -27,7 +27,7 @@ const champsPublics = {
   activite: { select: { nom: true } },
   avis: {
     orderBy: { createdAt: "desc" },
-    select: { id: true, note: true, commentaire: true, createdAt: true },
+    select: { id: true, note: true, commentaire: true, createdAt: true, compteClient: { select: { nom: true } } },
   },
 };
 
@@ -68,7 +68,8 @@ function presenterProfil(utilisateur) {
     photoUrl,
     noteMoyenne: Math.round(noteMoyenne * 10) / 10,
     nbAvis: avis.length,
-    avis,
+    // Seul le prénom de l'auteur est public
+    avis: avis.map(({ compteClient, ...a }) => ({ ...a, auteur: compteClient?.nom?.split(" ")[0] ?? null })),
     ...(realisations && {
       realisations: realisations.map(({ photoChemin: chemin, ...r }) => ({ ...r, photoUrl: urlOuNull(chemin) })),
     }),
