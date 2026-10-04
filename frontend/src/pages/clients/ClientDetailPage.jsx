@@ -4,7 +4,18 @@ import { Card } from '../../components/ui/Card.jsx'
 import { useFetch } from '../../hooks/useFetch.js'
 import './ClientDetailPage.css'
 
-const formatDate = (iso) => new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+const formatDate = (iso) => new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+const STATUTS = {
+  A_PLANIFIER: 'À planifier',
+  PLANIFIEE: 'Planifiée',
+  EN_COURS: 'En cours',
+  TERMINEE: 'Terminée',
+  ANNULEE: 'Annulée',
+}
+
+const PRIORITES = { BASSE: 'Basse', NORMALE: 'Normale', HAUTE: 'Haute', URGENTE: 'Urgente' };
+const formatDateCourte = (iso) => iso ? new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Non planifiée';
 
 function Champ({ label, children }) {
   return (
@@ -47,7 +58,44 @@ export default function ClientDetailPage() {
             <Champ label="Notes">{client.notes || '—'}</Champ>
           </dl>
         </Card>
-
+        <Card title={`Interventions (${client._count.interventions})`}>
+          {client.interventions.length === 0 ? (
+            <p className="client-detail__vide muted">Aucune intervention pour ce client.</p>
+          ) : (
+            <div className="client-detail__table-wrap">
+              <table className="client-detail__table">
+                <thead>
+                  <tr>
+                    <th>Référence</th>
+                    <th>Intervention</th>
+                    <th>Statut</th>
+                    <th>Priorité</th>
+                    <th>Date prévue</th>
+                    <th>Technicien</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {client.interventions.map((it) => (
+                    <tr key={it.id}>
+                      <td>
+                        <Link to={`/dashboard/interventions/${it.id}`} className="client-detail__ref">
+                          {it.reference}
+                        </Link>
+                      </td>
+                      <td>{it.objet}</td>
+                      <td>
+                        <Badge>{STATUTS[it.statut] ?? it.statut}</Badge>
+                      </td>
+                      <td className="muted">{PRIORITES[it.priorite] ?? it.priorite}</td>
+                      <td>{formatDateCourte(it.datePrevue)}</td>
+                      <td className="muted">{it.technicien?.nom ?? 'Non assigné'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
         {client.compteClient && (
           <Card title="Compte espace client">
             <dl className="client-detail__champs">

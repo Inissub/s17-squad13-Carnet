@@ -29,3 +29,40 @@
     font-weight: 500;
     white-space: pre-line;
 }
+.client-detail__table-wrap {
+    overflow-x: auto;
+}
+
+.client-detail__table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.client-detail__table th {
+    padding: var(--space-3) var(--space-4);
+    font-weight: 500;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+}
+
+.client-detail__table td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+}
+
+.client-detail__table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.client-detail__ref {
+    font-family: monospace;
+    text-decoration: underline;
+}
+
+.client-detail__vide {
+    padding: var(--space-5) var(--space-4);
+}
