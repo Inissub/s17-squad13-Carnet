@@ -68,3 +68,24 @@
 .clients-empty {
     padding: var(--space-5) var(--space-4);
 }
+
+.clients-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-4);
+}
+
+.clients-switch {
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--card);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.clients-switch:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}

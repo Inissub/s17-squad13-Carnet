@@ -25,7 +25,7 @@ export default function ClientDetailPage() {
       return (
         <div className="stack">
           <p className="muted">{error}</p>
-          <Link to="/dashboard/clients" className="client-detail__retour">Retour aux clients</Link>
+          <Link to="/dashboard/clients" className="client-detail__retour">Retour </Link>
         </div>
       )
     }

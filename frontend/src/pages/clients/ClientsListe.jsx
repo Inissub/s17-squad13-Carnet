@@ -42,9 +42,14 @@ export function ClientsListe({ titre, archive = false }) {
 
     return (
         <div className="stack">
-        <header>
-            <h1 className="page-title">{titre}</h1>
-            <p className="muted">{sousTitre}</p>
+        <header className="clients-header">
+            <div>
+                <h1 className="page-title">{titre}</h1>
+                <p className="muted">{sousTitre}</p>
+            </div>
+            <Link to={archive ? '/dashboard/clients' : '/dashboard/clients/archives'}className="clients-switch">
+                {archive ? ' Tous les clients' : 'Voir les archivés'}
+            </Link>
         </header>
 
         <Card title={titre} action={recherchePar}>
