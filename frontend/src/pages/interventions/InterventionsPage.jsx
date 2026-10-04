@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { api } from '../../api/client.js'
 import { Badge } from '../../components/ui/Badge.jsx'
 import { Button } from '../../components/ui/Button.jsx'
@@ -114,8 +114,10 @@ export default function InterventionsPage() {
   const q = searchParams.get('q') ?? ''
   const page = Math.max(1, Number(searchParams.get('page')) || 1)
   const [recherche, setRecherche] = useState(q)
-  // null : fermé ; 'nouvelle' : création ; sinon id de l'intervention modifiée
-  const [formulaire, setFormulaire] = useState(null)
+  const location = useLocation()
+  // null : fermé ; 'nouvelle' : création ; sinon id de l'intervention modifiée.
+  // Le bouton « Nouvelle intervention » du tableau de bord arrive ici avec le formulaire ouvert.
+  const [formulaire, setFormulaire] = useState(() => (location.state?.nouvelle ? 'nouvelle' : null))
 
   const { data, loading, error, reload } = useFetch(cheminListe({ page, statut: statutActif, q, du, au }))
   const visibles = data?.interventions ?? []

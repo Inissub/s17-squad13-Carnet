@@ -6,6 +6,7 @@ import { HttpError, notFound } from "../../utils/httpError.js";
 import { montantEnLettres } from "../../utils/lettres.js";
 import { blocClient, corpsRecu, entete, formatDate, ouvrirPdf } from "../../utils/pdf.js";
 import { prochaineReference } from "../interventions/references.js";
+import { arrondi, soldes } from "./soldes.js";
 
 export const facturationRouter = Router();
 
@@ -27,17 +28,6 @@ const paiementSchema = z.object({
   mode: z.enum(["ESPECES", "MOBILE_MONEY", "VIREMENT", "CHEQUE", "CARTE", "AUTRE"]),
   reference: z.preprocess((v) => (v === "" ? undefined : v), z.string().trim().optional()),
 });
-
-// Montants arrondis au centime pour éviter les écarts de calcul en virgule flottante
-const arrondi = (n) => Math.round(n * 100) / 100;
-
-function soldes(facture) {
-  const total = arrondi(facture.lignes.reduce((s, l) => s + Number(l.quantite) * Number(l.prixUnitaire), 0));
-  const encaisse = arrondi(facture.paiements.reduce((s, p) => s + Number(p.montant), 0));
-  const resteDu = arrondi(Math.max(0, total - encaisse));
-  const statut = encaisse <= 0 ? "NON_PAYEE" : resteDu > 0 ? "PARTIELLE" : "PAYEE";
-  return { total, encaisse, resteDu, statut };
-}
 
 const selectFacture = {
   id: true,
