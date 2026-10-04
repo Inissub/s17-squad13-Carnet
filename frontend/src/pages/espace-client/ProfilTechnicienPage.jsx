@@ -82,6 +82,7 @@ export default function ProfilTechnicienPage() {
     noteMoyenne = 0,
     nbAvis = 0,
     avis = [],
+    realisations = [],
   } = technicien
 
   return (
@@ -139,6 +140,22 @@ export default function ProfilTechnicienPage() {
           </Card>
         )}
       </div>
+
+      {realisations.length > 0 && (
+        <section className="profil-technicien__avis" aria-labelledby="realisations-titre">
+          <Card title={<span id="realisations-titre">Réalisations</span>}>
+            <ul className="profil-technicien__realisations">
+              {realisations.map((r) => (
+                <li key={r.id}>
+                  {r.photoUrl && <img src={r.photoUrl} alt={r.titre} loading="lazy" />}
+                  <strong>{r.titre}</strong>
+                  {r.description && <p>{r.description}</p>}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </section>
+      )}
 
       <section className="profil-technicien__avis" aria-labelledby="avis-titre">
         <Card title={<span id="avis-titre">Avis des clients</span>}>

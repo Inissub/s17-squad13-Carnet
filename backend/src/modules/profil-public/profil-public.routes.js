@@ -2,7 +2,8 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../../db/prisma.js";
 import { HttpError, notFound } from "../../utils/httpError.js";
-import { urlPublique } from "../../utils/stockage.js";
+import { uploadImage } from "../../middleware/upload.js";
+import { BUCKETS, dossiers, envoyerFichier, supprimerFichier, urlPublique } from "../../utils/stockage.js";
 
 export const profilPublicRouter = Router();
 
@@ -77,9 +78,23 @@ profilPublicRouter.patch("/", async (req, res) => {
   const modifications = profilSchema.parse(req.body);
   const utilisateur = await prisma.utilisateur.findUnique({
     where: { id },
-    select: { id: true, nom: true, slug: true },
+    select: { id: true, nom: true, slug: true, profilPublic: true, metier: true, ville: true, telephone: true, whatsapp: true },
   });
   if (!utilisateur) throw notFound("Utilisateur");
+
+  // Un profil visible dans l'annuaire doit permettre de savoir qui contacter, où et comment
+  const apres = { ...utilisateur, ...modifications };
+  if (apres.profilPublic) {
+    const manquants = [
+      !apres.metier && "le métier",
+      !apres.ville && "la ville",
+      !apres.telephone && !apres.whatsapp && "un numéro (téléphone ou WhatsApp)",
+    ].filter(Boolean);
+    if (manquants.length) {
+      const liste = manquants.length > 1 ? `${manquants.slice(0, -1).join(", ")} et ${manquants.at(-1)}` : manquants[0];
+      throw new HttpError(400, `Pour être visible dans l'annuaire, renseignez ${liste}.`);
+    }
+  }
 
   const data = { ...modifications };
   if (data.slug !== undefined) {
@@ -108,4 +123,104 @@ profilPublicRouter.patch("/", async (req, res) => {
     }
     throw error;
   }
+});
+
+// Photo de profil : bucket public (affichée dans l'annuaire sans connexion)
+profilPublicRouter.post("/photo", uploadImage, async (req, res) => {
+  const id = utilisateurId(req);
+  const ancien = await prisma.utilisateur.findUnique({ where: { id }, select: { photoChemin: true } });
+  if (!ancien) throw notFound("Utilisateur");
+
+  const fichier = await envoyerFichier({ bucket: BUCKETS.public, dossier: dossiers.profil(id), fichier: req.file });
+  const profil = await prisma.utilisateur.update({
+    where: { id },
+    data: { photoChemin: fichier.chemin, photoMime: fichier.typeMime },
+    select: selectProfil,
+  });
+  // L'ancienne photo n'est supprimée qu'une fois la nouvelle enregistrée
+  await supprimerFichier(BUCKETS.public, ancien.photoChemin).catch(() => {});
+  res.json(presenter(profil));
+});
+
+profilPublicRouter.delete("/photo", async (req, res) => {
+  const id = utilisateurId(req);
+  const ancien = await prisma.utilisateur.findUnique({ where: { id }, select: { photoChemin: true } });
+  if (!ancien) throw notFound("Utilisateur");
+  const profil = await prisma.utilisateur.update({
+    where: { id },
+    data: { photoChemin: null, photoMime: null },
+    select: selectProfil,
+  });
+  await supprimerFichier(BUCKETS.public, ancien.photoChemin).catch(() => {});
+  res.json(presenter(profil));
+});
+
+/* ---------- Réalisations : galerie de travaux présentée sur le profil public ---------- */
+
+const MAX_REALISATIONS = 12;
+
+const realisationSchema = z.object({
+  titre: z.string().trim().min(2, "Titre trop court").max(120),
+  description: z.preprocess((v) => (v === "" ? null : v), z.string().trim().max(500).nullable().optional()),
+});
+
+const selectRealisation = { id: true, titre: true, description: true, photoChemin: true, createdAt: true };
+
+function presenterRealisation({ photoChemin, ...realisation }) {
+  let photoUrl = null;
+  try {
+    photoUrl = urlPublique(photoChemin);
+  } catch {
+    // Sans stockage public configuré, la réalisation reste listée sans image
+  }
+  return { ...realisation, photoUrl };
+}
+
+async function trouverRealisation(req) {
+  const realisation = await prisma.realisation.findFirst({
+    where: { id: req.params.realisationId, utilisateurId: utilisateurId(req) },
+  });
+  if (!realisation) throw notFound("Réalisation");
+  return realisation;
+}
+
+profilPublicRouter.get("/realisations", async (req, res) => {
+  const realisations = await prisma.realisation.findMany({
+    where: { utilisateurId: utilisateurId(req) },
+    select: selectRealisation,
+    orderBy: { createdAt: "desc" },
+  });
+  res.json(realisations.map(presenterRealisation));
+});
+
+// Envoi en multipart : la photo (« fichier ») et les champs titre / description
+profilPublicRouter.post("/realisations", uploadImage, async (req, res) => {
+  const id = utilisateurId(req);
+  const data = realisationSchema.parse(req.body);
+  if (!req.file) throw new HttpError(400, "Ajoutez une photo de la réalisation");
+  const nombre = await prisma.realisation.count({ where: { utilisateurId: id } });
+  if (nombre >= MAX_REALISATIONS) {
+    throw new HttpError(409, `Vous avez atteint ${MAX_REALISATIONS} réalisations : supprimez-en une pour en ajouter.`);
+  }
+
+  const fichier = await envoyerFichier({ bucket: BUCKETS.public, dossier: `${dossiers.profil(id)}/realisations`, fichier: req.file });
+  const realisation = await prisma.realisation.create({
+    data: { utilisateurId: id, ...data, photoChemin: fichier.chemin, photoMime: fichier.typeMime },
+    select: selectRealisation,
+  });
+  res.status(201).json(presenterRealisation(realisation));
+});
+
+profilPublicRouter.put("/realisations/:realisationId", async (req, res) => {
+  const data = realisationSchema.parse(req.body);
+  const realisation = await trouverRealisation(req);
+  const misAJour = await prisma.realisation.update({ where: { id: realisation.id }, data, select: selectRealisation });
+  res.json(presenterRealisation(misAJour));
+});
+
+profilPublicRouter.delete("/realisations/:realisationId", async (req, res) => {
+  const realisation = await trouverRealisation(req);
+  await prisma.realisation.delete({ where: { id: realisation.id } });
+  await supprimerFichier(BUCKETS.public, realisation.photoChemin).catch(() => {});
+  res.status(204).end();
 });

@@ -399,6 +399,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Activite: 'Activite',
   Utilisateur: 'Utilisateur',
+  Realisation: 'Realisation',
   Compteur: 'Compteur',
   Client: 'Client',
   Intervention: 'Intervention',
@@ -427,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "activite" | "utilisateur" | "compteur" | "client" | "intervention" | "historiqueStatut" | "rapport" | "pieceJointe" | "devis" | "ligneDevis" | "facture" | "ligneFacture" | "paiement" | "compteClient" | "avis"
+    modelProps: "activite" | "utilisateur" | "realisation" | "compteur" | "client" | "intervention" | "historiqueStatut" | "rapport" | "pieceJointe" | "devis" | "ligneDevis" | "facture" | "ligneFacture" | "paiement" | "compteClient" | "avis"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -576,6 +577,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UtilisateurCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UtilisateurCountAggregateOutputType> | number
+        }
+      }
+    }
+    Realisation: {
+      payload: Prisma.$RealisationPayload<ExtArgs>
+      fields: Prisma.RealisationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RealisationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealisationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RealisationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealisationPayload>
+        }
+        findFirst: {
+          args: Prisma.RealisationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealisationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RealisationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealisationPayload>
+        }
+        findMany: {
+          args: Prisma.RealisationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealisationPayload>[]
+        }
+        create: {
+          args: Prisma.RealisationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealisationPayload>
+        }
+        createMany: {
+          args: Prisma.RealisationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RealisationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealisationPayload>[]
+        }
+        delete: {
+          args: Prisma.RealisationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealisationPayload>
+        }
+        update: {
+          args: Prisma.RealisationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealisationPayload>
+        }
+        deleteMany: {
+          args: Prisma.RealisationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RealisationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RealisationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealisationPayload>[]
+        }
+        upsert: {
+          args: Prisma.RealisationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RealisationPayload>
+        }
+        aggregate: {
+          args: Prisma.RealisationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRealisation>
+        }
+        groupBy: {
+          args: Prisma.RealisationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealisationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RealisationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RealisationCountAggregateOutputType> | number
         }
       }
     }
@@ -1623,6 +1698,19 @@ export const UtilisateurScalarFieldEnum = {
 export type UtilisateurScalarFieldEnum = (typeof UtilisateurScalarFieldEnum)[keyof typeof UtilisateurScalarFieldEnum]
 
 
+export const RealisationScalarFieldEnum = {
+  id: 'id',
+  utilisateurId: 'utilisateurId',
+  titre: 'titre',
+  description: 'description',
+  photoChemin: 'photoChemin',
+  photoMime: 'photoMime',
+  createdAt: 'createdAt'
+} as const
+
+export type RealisationScalarFieldEnum = (typeof RealisationScalarFieldEnum)[keyof typeof RealisationScalarFieldEnum]
+
+
 export const CompteurScalarFieldEnum = {
   activiteId: 'activiteId',
   type: 'type',
@@ -2189,6 +2277,7 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   activite?: Prisma.ActiviteOmit
   utilisateur?: Prisma.UtilisateurOmit
+  realisation?: Prisma.RealisationOmit
   compteur?: Prisma.CompteurOmit
   client?: Prisma.ClientOmit
   intervention?: Prisma.InterventionOmit

@@ -1,31 +1,50 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card } from '../../components/ui/Card.jsx'
 import { api } from '../../api/client.js'
+import { Button } from '../../components/ui/Button.jsx'
+import { Card } from '../../components/ui/Card.jsx'
+import { Input } from '../../components/ui/Input.jsx'
+import { Select } from '../../components/ui/Select.jsx'
+import { Realisations } from './Realisations.jsx'
 import './ProfilPublicPage.css'
 
+// Principales villes du Congo-Brazzaville, pour que l'annuaire puisse filtrer de façon fiable
+const VILLES = [
+  'Brazzaville',
+  'Pointe-Noire',
+  'Dolisie',
+  'Nkayi',
+  'Ouesso',
+  'Owando',
+  'Oyo',
+  'Impfondo',
+  'Madingou',
+  'Sibiti',
+  'Kinkala',
+  'Djambala',
+  'Ewo',
+  'Gamboma',
+  'Mossendjo',
+]
+
 const FORMULAIRE_VIDE = {
-  nom: '',
   metier: '',
   ville: '',
   quartier: '',
   telephone: '',
   whatsapp: '',
   bio: '',
-  slug: '',
   profilPublic: false,
 }
 
 function versFormulaire(profil) {
   return {
-    nom: profil.nom ?? '',
     metier: profil.metier ?? '',
     ville: profil.ville ?? '',
     quartier: profil.quartier ?? '',
     telephone: profil.telephone ?? '',
     whatsapp: profil.whatsapp ?? '',
     bio: profil.bio ?? '',
-    slug: profil.slug ?? '',
     profilPublic: Boolean(profil.profilPublic),
   }
 }
@@ -37,146 +56,270 @@ function ouNull(valeur) {
 
 function versEnvoi(form) {
   return {
-    nom: form.nom.trim(),
     metier: ouNull(form.metier),
     ville: ouNull(form.ville),
     quartier: ouNull(form.quartier),
     telephone: ouNull(form.telephone),
     whatsapp: ouNull(form.whatsapp),
     bio: ouNull(form.bio),
-    slug: ouNull(form.slug),
     profilPublic: form.profilPublic,
   }
 }
 
+const initiales = (nom = '') =>
+  nom
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((mot) => mot[0].toUpperCase())
+    .join('')
+
+function Photo({ profil, onChange }) {
+  const entree = useRef(null)
+  const [envoi, setEnvoi] = useState(false)
+  const [erreur, setErreur] = useState(null)
+
+  async function envoyer(e) {
+    const fichier = e.target.files?.[0]
+    e.target.value = ''
+    if (!fichier) return
+    const donnees = new FormData()
+    donnees.append('fichier', fichier)
+    setEnvoi(true)
+    setErreur(null)
+    try {
+      onChange(await api.post('/profil-public/photo', donnees))
+    } catch (err) {
+      setErreur(err.message)
+    } finally {
+      setEnvoi(false)
+    }
+  }
+
+  async function retirer() {
+    setEnvoi(true)
+    setErreur(null)
+    try {
+      onChange(await api.del('/profil-public/photo'))
+    } catch (err) {
+      setErreur(err.message)
+    } finally {
+      setEnvoi(false)
+    }
+  }
+
+  return (
+    <Card className="profil__carte" title="Photo">
+      <div className="profil__photo">
+        {profil.photoUrl ? (
+          <img src={profil.photoUrl} alt="" className="profil__avatar profil__avatar--image" />
+        ) : (
+          <span className="profil__avatar" aria-hidden="true">
+            {initiales(profil.nom)}
+          </span>
+        )}
+        <input ref={entree} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={envoyer} />
+        <div className="profil__photo-actions">
+          <Button variant="secondary" size="sm" onClick={() => entree.current?.click()} disabled={envoi}>
+            {envoi ? 'Envoi…' : profil.photoUrl ? 'Changer' : '+ Ajouter'}
+          </Button>
+          {profil.photoUrl && (
+            <Button variant="ghost" size="sm" onClick={retirer} disabled={envoi}>
+              Retirer
+            </Button>
+          )}
+        </div>
+      </div>
+      {erreur && <p className="field__error">{erreur}</p>}
+      <p className="profil__aide muted">JPEG, PNG ou WebP, 5 Mo maximum.</p>
+    </Card>
+  )
+}
+
+function MonLien({ profil }) {
+  const [copie, setCopie] = useState(false)
+  const visible = profil.profilPublic && profil.slug
+  const url = visible ? `${window.location.origin}/t/${profil.slug}` : null
+
+  async function copier() {
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopie(true)
+      setTimeout(() => setCopie(false), 2000)
+    } catch {
+      // Copie impossible (navigateur sans accès au presse-papiers) : le lien reste sélectionnable
+    }
+  }
+
+  return (
+    <Card className="profil__carte" title="Mon lien">
+      {visible ? (
+        <div className="profil__lien">
+          <code className="profil__url">{url}</code>
+          <div className="profil__photo-actions">
+            <Button variant="secondary" size="sm" onClick={copier}>
+              {copie ? 'Copié' : 'Copier'}
+            </Button>
+            <Link to={`/t/${profil.slug}`} target="_blank" className="btn btn--ghost btn--sm">
+              Voir ma page
+            </Link>
+          </div>
+          <p className="profil__aide muted">Partagez-le sur WhatsApp ou vos cartes de visite.</p>
+        </div>
+      ) : (
+        <p className="muted">Rendez votre profil visible pour obtenir votre lien.</p>
+      )}
+    </Card>
+  )
+}
+
 export default function ProfilPublicPage() {
+  const [profil, setProfil] = useState(null)
   const [form, setForm] = useState(FORMULAIRE_VIDE)
-  const [publie, setPublie] = useState({ slug: null, visible: false })
-  const [chargement, setChargement] = useState(true)
+  const [erreurChargement, setErreurChargement] = useState(null)
   const [enCours, setEnCours] = useState(false)
   const [message, setMessage] = useState(null)
+  const idBio = useId()
 
   useEffect(() => {
     let actif = true
     api
       .get('/profil-public')
-      .then((profil) => {
+      .then((p) => {
         if (!actif) return
-        setForm(versFormulaire(profil))
-        setPublie({ slug: profil.slug, visible: Boolean(profil.profilPublic) })
+        setProfil(p)
+        setForm(versFormulaire(p))
       })
-      .catch((e) => {
-        if (actif) setMessage({ type: 'erreur', texte: e.message })
-      })
-      .finally(() => {
-        if (actif) setChargement(false)
-      })
+      .catch((e) => actif && setErreurChargement(e.message))
     return () => {
       actif = false
     }
   }, [])
 
-  function changer(champ) {
-    return (e) => setForm((courant) => ({ ...courant, [champ]: e.target.value }))
-  }
+  const changer = (champ) => (e) => setForm((courant) => ({ ...courant, [champ]: e.target.value }))
 
   async function enregistrer(e) {
     e.preventDefault()
     setEnCours(true)
     setMessage(null)
     try {
-      const profil = await api.patch('/profil-public', versEnvoi(form))
-      setForm(versFormulaire(profil))
-      setPublie({ slug: profil.slug, visible: Boolean(profil.profilPublic) })
-      setMessage({ type: 'ok', texte: 'Profil enregistré.' })
-    } catch (erreur) {
-      setMessage({ type: 'erreur', texte: erreur.message })
+      const p = await api.patch('/profil-public', versEnvoi(form))
+      setProfil(p)
+      setForm(versFormulaire(p))
+      setMessage({ type: 'ok', texte: p.profilPublic ? 'Profil enregistré et visible dans l’annuaire.' : 'Profil enregistré.' })
+    } catch (err) {
+      setMessage({ type: 'erreur', texte: err.data?.details?.[0]?.message ?? err.message })
     } finally {
       setEnCours(false)
     }
   }
 
+  // Une ville saisie avant la liste reste proposée
+  const villes = form.ville && !VILLES.includes(form.ville) ? [form.ville, ...VILLES] : VILLES
+
   return (
-    <div>
-      <h1 className="page-title">Mon profil public</h1>
-      <p className="muted">Ces informations sont visibles par les clients dans l'annuaire.</p>
+    <div className="profil">
+      <header>
+        <h1 className="profil__titre">Mon profil public</h1>
+        <p className="muted">Ce que vos clients voient dans l’annuaire et sur votre page.</p>
+      </header>
 
-      {chargement ? (
-        <p className="muted">Chargement…</p>
+      {!profil ? (
+        <p className={erreurChargement ? 'field__error' : 'muted'}>{erreurChargement ?? 'Chargement…'}</p>
       ) : (
-        <Card>
-          <form className="profil-public__formulaire" onSubmit={enregistrer}>
-            <div className="profil-public__grille">
-              <label className="profil-public__champ">
-                <span className="profil-public__label">Nom</span>
-                <input className="profil-public__saisie" value={form.nom} onChange={changer('nom')} maxLength={120} required />
-              </label>
-              <label className="profil-public__champ">
-                <span className="profil-public__label">Métier</span>
-                <input className="profil-public__saisie" value={form.metier} onChange={changer('metier')} maxLength={120} />
-              </label>
-              <label className="profil-public__champ">
-                <span className="profil-public__label">Ville</span>
-                <input className="profil-public__saisie" value={form.ville} onChange={changer('ville')} maxLength={100} />
-              </label>
-              <label className="profil-public__champ">
-                <span className="profil-public__label">Quartier</span>
-                <input className="profil-public__saisie" value={form.quartier} onChange={changer('quartier')} maxLength={100} />
-              </label>
-              <label className="profil-public__champ">
-                <span className="profil-public__label">Téléphone</span>
-                <input className="profil-public__saisie" value={form.telephone} onChange={changer('telephone')} maxLength={40} />
-              </label>
-              <label className="profil-public__champ">
-                <span className="profil-public__label">WhatsApp</span>
-                <input className="profil-public__saisie" value={form.whatsapp} onChange={changer('whatsapp')} maxLength={40} />
-              </label>
-            </div>
+        <div className="profil__corps">
+          <div className="profil__principal">
+            <Card className="profil__carte" title="Informations publiques">
+              <form className="profil__formulaire" onSubmit={enregistrer}>
+                <label className="profil__visibilite">
+                  <input
+                    type="checkbox"
+                    checked={form.profilPublic}
+                    onChange={(e) => setForm((courant) => ({ ...courant, profilPublic: e.target.checked }))}
+                  />
+                  <span>
+                    <strong>Profil visible dans l’annuaire</strong>
+                    <span className="muted">
+                      Les clients peuvent vous trouver, vous contacter et voir vos avis. Métier, ville et un numéro sont requis.
+                    </span>
+                  </span>
+                </label>
 
-            <label className="profil-public__champ">
-              <span className="profil-public__label">Présentation</span>
-              <textarea
-                className="profil-public__saisie profil-public__saisie--long"
-                value={form.bio}
-                onChange={changer('bio')}
-                maxLength={2000}
-              />
-            </label>
+                <div className="profil__grille">
+                  <Input label="Métier" placeholder="Ex. Plombier" value={form.metier} onChange={changer('metier')} maxLength={120} />
+                  <Select label="Ville" value={form.ville} onChange={changer('ville')}>
+                    <option value="">Choisir…</option>
+                    {villes.map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))}
+                  </Select>
+                  <Input
+                    label="Quartier / arrondissement"
+                    placeholder="Ex. Moungali"
+                    value={form.quartier}
+                    onChange={changer('quartier')}
+                    maxLength={100}
+                  />
+                  <Input
+                    label="Téléphone"
+                    type="tel"
+                    placeholder="+242 06 000 00 00"
+                    value={form.telephone}
+                    onChange={changer('telephone')}
+                    maxLength={40}
+                  />
+                  <Input
+                    label="WhatsApp"
+                    type="tel"
+                    placeholder="+242 06 000 00 00"
+                    value={form.whatsapp}
+                    onChange={changer('whatsapp')}
+                    maxLength={40}
+                  />
+                  <p className="profil__email muted">
+                    Email affiché : <span>{profil.email}</span>
+                  </p>
+                </div>
 
-            <label className="profil-public__champ">
-              <span className="profil-public__label">Lien public</span>
-              <input className="profil-public__saisie" value={form.slug} onChange={changer('slug')} maxLength={80} />
-              <span className="profil-public__aide">
-                Laissé vide, il est créé à partir de ton nom quand tu actives le profil.
-              </span>
-            </label>
+                <div className="field">
+                  <label className="field__label" htmlFor={idBio}>
+                    Présentation
+                  </label>
+                  <textarea
+                    id={idBio}
+                    className="field__control profil__bio"
+                    placeholder="Vos spécialités, votre expérience, vos zones d’intervention…"
+                    value={form.bio}
+                    onChange={changer('bio')}
+                    maxLength={2000}
+                    rows={4}
+                  />
+                </div>
 
-            <label className="profil-public__visibilite">
-              <input
-                type="checkbox"
-                checked={form.profilPublic}
-                onChange={(e) => setForm((courant) => ({ ...courant, profilPublic: e.target.checked }))}
-              />
-              Rendre mon profil visible dans l'annuaire
-            </label>
+                {message && (
+                  <p className={`profil__message profil__message--${message.type}`} role={message.type === 'erreur' ? 'alert' : 'status'}>
+                    {message.texte}
+                  </p>
+                )}
 
-            {message && (
-              <div className={`profil-public__message profil-public__message--${message.type}`}>
-                {message.texte}
-              </div>
-            )}
+                <div>
+                  <Button type="submit" disabled={enCours}>
+                    {enCours ? 'Enregistrement…' : 'Enregistrer'}
+                  </Button>
+                </div>
+              </form>
+            </Card>
 
-            <button className="profil-public__bouton" type="submit" disabled={enCours}>
-              {enCours ? 'Enregistrement…' : 'Enregistrer'}
-            </button>
-          </form>
+            <Realisations />
+          </div>
 
-          {publie.visible && publie.slug && (
-            <div className="profil-public__lien">
-              <Link to={`/t/${publie.slug}`}>Voir mon profil public</Link>
-            </div>
-          )}
-        </Card>
+          <aside className="profil__cote">
+            <Photo profil={profil} onChange={setProfil} />
+            <MonLien profil={profil} />
+          </aside>
+        </div>
       )}
     </div>
   )

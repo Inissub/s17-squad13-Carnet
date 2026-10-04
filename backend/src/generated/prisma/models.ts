@@ -10,6 +10,7 @@
  */
 export type * from './models/Activite.ts'
 export type * from './models/Utilisateur.ts'
+export type * from './models/Realisation.ts'
 export type * from './models/Compteur.ts'
 export type * from './models/Client.ts'
 export type * from './models/Intervention.ts'

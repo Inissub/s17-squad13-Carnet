@@ -31,8 +31,25 @@ const champsPublics = {
   },
 };
 
+// Réalisations : seulement sur la page d'un technicien, pas dans la liste de l'annuaire
+const champsPage = {
+  ...champsPublics,
+  realisations: {
+    orderBy: { createdAt: "desc" },
+    select: { id: true, titre: true, description: true, photoChemin: true },
+  },
+};
+
+function urlOuNull(chemin) {
+  try {
+    return urlPublique(chemin);
+  } catch {
+    return null;
+  }
+}
+
 function presenterProfil(utilisateur) {
-  const { photoChemin, avis, ...profil } = utilisateur;
+  const { photoChemin, avis, realisations, ...profil } = utilisateur;
   const noteMoyenne = avis.length
     ? avis.reduce((total, avisClient) => total + avisClient.note, 0) / avis.length
     : 0;
@@ -52,6 +69,9 @@ function presenterProfil(utilisateur) {
     noteMoyenne: Math.round(noteMoyenne * 10) / 10,
     nbAvis: avis.length,
     avis,
+    ...(realisations && {
+      realisations: realisations.map(({ photoChemin: chemin, ...r }) => ({ ...r, photoUrl: urlOuNull(chemin) })),
+    }),
   };
 }
 
@@ -90,7 +110,7 @@ annuaireRouter.get("/:slug", async (req, res) => {
   const slug = slugSchema.parse(req.params.slug);
   const profil = await prisma.utilisateur.findFirst({
     where: { slug, actif: true, profilPublic: true, role: { in: ["RESPONSABLE", "TECHNICIEN"] } },
-    select: champsPublics,
+    select: champsPage,
   });
 
   if (!profil) throw notFound("Profil public");

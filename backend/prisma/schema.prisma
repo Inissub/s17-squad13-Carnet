@@ -114,9 +114,25 @@ model Utilisateur {
   interventions Intervention[]     @relation("TechnicienIntervention")
   historiques   HistoriqueStatut[]
   avis          Avis[]
+  realisations  Realisation[]
 
   @@index([profilPublic, ville])
   @@index([activiteId])
+}
+
+// Réalisation présentée sur le profil public d'un technicien (photo dans le bucket public)
+model Realisation {
+  id            String   @id @default(uuid())
+  utilisateurId String
+  titre         String
+  description   String?
+  photoChemin   String
+  photoMime     String
+  createdAt     DateTime @default(now())
+
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+
+  @@index([utilisateurId])
 }
 
 model Compteur {

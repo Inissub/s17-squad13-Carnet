@@ -52,6 +52,11 @@ export type Activite = Prisma.ActiviteModel
  */
 export type Utilisateur = Prisma.UtilisateurModel
 /**
+ * Model Realisation
+ * 
+ */
+export type Realisation = Prisma.RealisationModel
+/**
  * Model Compteur
  * 
  */
