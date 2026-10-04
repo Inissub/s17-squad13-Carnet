@@ -5,6 +5,8 @@
 
 .profil-technicien__retour {
   display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   margin-bottom: var(--space-4);
   color: var(--muted);
   text-decoration: none;
