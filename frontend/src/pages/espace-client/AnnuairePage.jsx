@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Card } from '../../components/ui/Card.jsx'
 import { api } from '../../api/client.js'
 import './AnnuairePage.css'
@@ -53,8 +53,10 @@ export default function AnnuairePage() {
   const [techniciens, setTechniciens] = useState([])
   const [chargement, setChargement] = useState(true)
   const [erreur, setErreur] = useState('')
-  const [recherche, setRecherche] = useState('')
-  const [ville, setVille] = useState('')
+  // La recherche de la landing arrive ici avec ?q=…&ville=…
+  const [searchParams] = useSearchParams()
+  const [recherche, setRecherche] = useState(() => searchParams.get('q') ?? '')
+  const [ville, setVille] = useState(() => searchParams.get('ville') ?? '')
   const [tentative, setTentative] = useState(0)
 
   useEffect(() => {
@@ -76,10 +78,11 @@ export default function AnnuairePage() {
     }
   }, [tentative])
 
+  // La ville choisie sur la landing reste affichée même si aucun technicien n'y est encore inscrit
   const villes = useMemo(
-    () => [...new Set(techniciens.map((technicien) => technicien.ville).filter(Boolean))]
+    () => [...new Set([...techniciens.map((technicien) => technicien.ville), ville].filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, 'fr')),
-    [techniciens],
+    [techniciens, ville],
   )
 
   const resultats = useMemo(() => {

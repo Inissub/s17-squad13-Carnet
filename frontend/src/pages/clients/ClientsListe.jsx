@@ -1,106 +1,185 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Badge } from '../../components/ui/Badge.jsx'
+import { Link, useSearchParams } from 'react-router-dom'
+import { api } from '../../api/client.js'
+import { BadgeClient } from './BadgeClient.jsx'
 import { Card } from '../../components/ui/Card.jsx'
-import { useFetch } from '../../hooks/useFetch.js'
+import '../../components/ui/Filtres.css'
 import { useAuth } from '../../context/AuthContext.jsx'
+import { useFetch } from '../../hooks/useFetch.js'
 import './ClientsListe.css'
 
+function Icone({ children }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {children}
+    </svg>
+  )
+}
 
+function ActionArchive({ client, onChange }) {
+  const [envoi, setEnvoi] = useState(false)
+  const [erreur, setErreur] = useState(null)
+  const archiver = !client.archive
 
-export function ClientsListe({ titre, archive = false }) {
-    const navigate = useNavigate();
-    const [saisie, setSaisie] = useState('');
-    const [recherche, setRecherche] = useState('');
-    const { user } = useAuth();
+  async function basculer() {
+    setEnvoi(true)
+    setErreur(null)
+    try {
+      await api.patch(`/clients/${client.id}/archive`, { archive: archiver })
+      onChange()
+    } catch (err) {
+      setErreur(err.message)
+      setEnvoi(false)
+    }
+  }
 
+  return (
+    <>
+      <button
+        type="button"
+        className="clients__action"
+        onClick={basculer}
+        disabled={envoi}
+        aria-label={`${archiver ? 'Archiver' : 'Désarchiver'} ${client.nom}`}
+        title={archiver ? 'Archiver' : 'Désarchiver'}
+      >
+        {archiver ? (
+          <Icone>
+            <rect x="3" y="4" width="18" height="5" rx="1" />
+            <path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M10 13h4" />
+          </Icone>
+        ) : (
+          <Icone>
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5" />
+          </Icone>
+        )}
+      </button>
+      {erreur && <span className="clients__erreur">{erreur}</span>}
+    </>
+  )
+}
 
-    useEffect(() => {
-        const timer = setTimeout(() => setRecherche(saisie.trim()), 300)
-        return () => clearTimeout(timer)
-    }, [saisie])
+// Liste des clients, externes et inscrits sur Carnet (actifs ou archivés) : recherche, actions par ligne
+export function ClientsListe({ archive = false, version = 0, onModifier }) {
+  const { user } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const q = searchParams.get('q') ?? ''
+  const [saisie, setSaisie] = useState(q)
 
-    const params = new URLSearchParams({ archive: String(archive) })
-    if (recherche) params.set('q', recherche)
+  // La recherche part au serveur 300 ms après la dernière frappe ; elle est gardée dans l'URL
+  useEffect(() => {
+    const terme = saisie.trim()
+    if (terme === q) return
+    const timer = setTimeout(
+      () =>
+        setSearchParams(
+          (p) => {
+            const suivants = new URLSearchParams(p)
+            if (terme) suivants.set('q', terme)
+            else suivants.delete('q')
+            return suivants
+          },
+          { replace: true },
+        ),
+      300,
+    )
+    return () => clearTimeout(timer)
+  }, [saisie, q, setSearchParams])
 
-    const { data: clients, loading, error } = useFetch(`/clients?${params}`)
+  const params = new URLSearchParams({ archive: String(archive) })
+  if (q) params.set('q', q)
+  const { data, loading, error, reload } = useFetch(`/clients?${params}`)
 
-    const sousTitre = clients
-        ? `${clients.length} client${clients.length > 1 ? 's' : ''}${recherche ? ' trouvé' + (clients.length > 1 ? 's' : '') : ' au total'}`
-        : 'Chargement…'
+  // Rechargement demandé par la page (client ajouté ou modifié)
+  useEffect(() => {
+    if (version > 0) reload()
+  }, [version, reload])
 
-    const recherchePar = (
-        <label className="clients-search">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+  const clients = data ?? []
+
+  return (
+    <div className="clients__liste">
+      <div className="clients__barre">
+        <p className="muted">
+          {clients.length} client{clients.length > 1 ? 's' : ''}
+          {q ? ' pour cette recherche' : ''}
+        </p>
+        <label className="recherche">
+          <Icone>
             <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-3.5-3.5" />
-        </svg>
-        <input
+            <path d="m20 20-3.5-3.5" />
+          </Icone>
+          <input
             type="search"
             placeholder="Nom, téléphone ou adresse…"
             value={saisie}
             onChange={(e) => setSaisie(e.target.value)}
-        />
+            aria-label="Rechercher un client"
+          />
         </label>
-    )
+      </div>
 
-    return (
-        <div className="stack">
-        <header className="clients-header">
-            <div>
-                <h1 className="page-title">{titre}</h1>
-                <p className="muted">{sousTitre}</p>
-            </div>
-            <div className="clients-header__actions">
-                <Link to={archive ? '/dashboard/clients' : '/dashboard/clients/archives'} className="clients-switch">
-                    {archive ? ' Tous les clients' : 'Voir les archivés'}
-                </Link>
-                {!archive && user?.role === 'RESPONSABLE' && (
-                    <Link to="/dashboard/clients/nouveau" className="clients-nouveau">+ Nouveau client</Link>
-                )}
-            </div>
-        </header>
-
-        <Card title={titre} action={recherchePar}>
-            {error && <p className="clients-empty muted">{error}</p>}
-            {loading && !clients && <p className="clients-empty muted">Chargement…</p>}
-            {clients?.length === 0 && (
-            <p className="clients-empty muted">
-                {recherche ? 'Aucun client ne correspond à la recherche.' : 'Aucun client pour le moment.'}
-            </p>
-            )}
-
-            {clients?.length > 0 && (
-            <div className="clients-table-wrap">
-                <table className="clients-table">
-                <thead>
-                    <tr>
-                    <th>Client</th>
-                    <th>Téléphone</th>
-                    <th>Adresse</th>
-                    <th>Interventions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {clients.map((client) => (
-                    <tr key={client.id} onClick={() => navigate(`/dashboard/clients/${client.id}`)}>
-                        <td>
-                        <Link to={`/dashboard/clients/${client.id}`} className="clients-table__nom">
-                            {client.nom}
-                        </Link>
-                        </td>
-                        <td>{client.telephone || '—'}</td>
-                        <td className="muted">{client.adresse || 'Non renseignée'}</td>
-                        <td>
-                        <Badge>{client._count.interventions}</Badge>
-                        </td>
-                    </tr>
-                    ))}
-                </tbody>
-                </table>
-            </div>
-            )}
-        </Card>
-        </div>
-    )
+      <Card className="clients__card" title={archive ? 'Clients archivés' : 'Tous les clients'}>
+        {loading && !data ? (
+          <p className="clients__etat muted">Chargement…</p>
+        ) : error ? (
+          <p className="clients__etat muted">{error}</p>
+        ) : clients.length === 0 ? (
+          <p className="clients__etat muted">
+            {q ? 'Aucun client ne correspond à ces critères.' : archive ? 'Aucun client archivé.' : 'Aucun client pour le moment.'}
+          </p>
+        ) : (
+          <div className="clients__scroll">
+            <table className="clients__table">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Téléphone</th>
+                  <th>Statut</th>
+                  <th>Interventions</th>
+                  <th aria-label="Actions" />
+                </tr>
+              </thead>
+              <tbody>
+                {clients.map((client) => (
+                  <tr key={client.id}>
+                    <td>
+                      <Link to={`/dashboard/clients/${client.id}`} className="clients__nom">
+                        {client.nom}
+                      </Link>
+                      <span className="clients__sous muted">{client.adresse || 'Adresse non renseignée'}</span>
+                    </td>
+                    <td className={client.telephone ? 'clients__tel' : 'muted'}>{client.telephone || '—'}</td>
+                    <td>
+                      <BadgeClient client={client} />
+                    </td>
+                    <td>
+                      {client._count.interventions} intervention{client._count.interventions > 1 ? 's' : ''}
+                    </td>
+                    <td className="clients__actions">
+                      <Link to={`/dashboard/clients/${client.id}`} className="clients__action" aria-label={`Voir ${client.nom}`} title="Voir">
+                        <Icone>
+                          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </Icone>
+                      </Link>
+                      {/* Un client enregistré sur Carnet est en consultation seule : ni modification, ni archivage */}
+                      {onModifier && !client.compteClientId && (
+                        <button type="button" className="clients__action" onClick={() => onModifier(client)} aria-label={`Modifier ${client.nom}`} title="Modifier">
+                          <Icone>
+                            <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                          </Icone>
+                        </button>
+                      )}
+                      {user?.role === 'RESPONSABLE' && !client.compteClientId && <ActionArchive client={client} onChange={reload} />}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+    </div>
+  )
 }

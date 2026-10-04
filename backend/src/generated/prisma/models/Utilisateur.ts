@@ -314,6 +314,7 @@ export type UtilisateurWhereInput = {
   interventions?: Prisma.InterventionListRelationFilter
   historiques?: Prisma.HistoriqueStatutListRelationFilter
   avis?: Prisma.AvisListRelationFilter
+  realisations?: Prisma.RealisationListRelationFilter
 }
 
 export type UtilisateurOrderByWithRelationInput = {
@@ -342,6 +343,7 @@ export type UtilisateurOrderByWithRelationInput = {
   interventions?: Prisma.InterventionOrderByRelationAggregateInput
   historiques?: Prisma.HistoriqueStatutOrderByRelationAggregateInput
   avis?: Prisma.AvisOrderByRelationAggregateInput
+  realisations?: Prisma.RealisationOrderByRelationAggregateInput
 }
 
 export type UtilisateurWhereUniqueInput = Prisma.AtLeast<{
@@ -373,6 +375,7 @@ export type UtilisateurWhereUniqueInput = Prisma.AtLeast<{
   interventions?: Prisma.InterventionListRelationFilter
   historiques?: Prisma.HistoriqueStatutListRelationFilter
   avis?: Prisma.AvisListRelationFilter
+  realisations?: Prisma.RealisationListRelationFilter
 }, "id" | "email" | "jetonActivationHash" | "slug">
 
 export type UtilisateurOrderByWithAggregationInput = {
@@ -454,6 +457,7 @@ export type UtilisateurCreateInput = {
   interventions?: Prisma.InterventionCreateNestedManyWithoutTechnicienInput
   historiques?: Prisma.HistoriqueStatutCreateNestedManyWithoutUtilisateurInput
   avis?: Prisma.AvisCreateNestedManyWithoutTechnicienInput
+  realisations?: Prisma.RealisationCreateNestedManyWithoutUtilisateurInput
 }
 
 export type UtilisateurUncheckedCreateInput = {
@@ -481,6 +485,7 @@ export type UtilisateurUncheckedCreateInput = {
   interventions?: Prisma.InterventionUncheckedCreateNestedManyWithoutTechnicienInput
   historiques?: Prisma.HistoriqueStatutUncheckedCreateNestedManyWithoutUtilisateurInput
   avis?: Prisma.AvisUncheckedCreateNestedManyWithoutTechnicienInput
+  realisations?: Prisma.RealisationUncheckedCreateNestedManyWithoutUtilisateurInput
 }
 
 export type UtilisateurUpdateInput = {
@@ -508,6 +513,7 @@ export type UtilisateurUpdateInput = {
   interventions?: Prisma.InterventionUpdateManyWithoutTechnicienNestedInput
   historiques?: Prisma.HistoriqueStatutUpdateManyWithoutUtilisateurNestedInput
   avis?: Prisma.AvisUpdateManyWithoutTechnicienNestedInput
+  realisations?: Prisma.RealisationUpdateManyWithoutUtilisateurNestedInput
 }
 
 export type UtilisateurUncheckedUpdateInput = {
@@ -535,6 +541,7 @@ export type UtilisateurUncheckedUpdateInput = {
   interventions?: Prisma.InterventionUncheckedUpdateManyWithoutTechnicienNestedInput
   historiques?: Prisma.HistoriqueStatutUncheckedUpdateManyWithoutUtilisateurNestedInput
   avis?: Prisma.AvisUncheckedUpdateManyWithoutTechnicienNestedInput
+  realisations?: Prisma.RealisationUncheckedUpdateManyWithoutUtilisateurNestedInput
 }
 
 export type UtilisateurCreateManyInput = {
@@ -690,14 +697,14 @@ export type UtilisateurMinOrderByAggregateInput = {
   photoMime?: Prisma.SortOrder
 }
 
-export type UtilisateurNullableScalarRelationFilter = {
-  is?: Prisma.UtilisateurWhereInput | null
-  isNot?: Prisma.UtilisateurWhereInput | null
-}
-
 export type UtilisateurScalarRelationFilter = {
   is?: Prisma.UtilisateurWhereInput
   isNot?: Prisma.UtilisateurWhereInput
+}
+
+export type UtilisateurNullableScalarRelationFilter = {
+  is?: Prisma.UtilisateurWhereInput | null
+  isNot?: Prisma.UtilisateurWhereInput | null
 }
 
 export type UtilisateurCreateNestedManyWithoutActiviteInput = {
@@ -752,6 +759,20 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type UtilisateurCreateNestedOneWithoutRealisationsInput = {
+  create?: Prisma.XOR<Prisma.UtilisateurCreateWithoutRealisationsInput, Prisma.UtilisateurUncheckedCreateWithoutRealisationsInput>
+  connectOrCreate?: Prisma.UtilisateurCreateOrConnectWithoutRealisationsInput
+  connect?: Prisma.UtilisateurWhereUniqueInput
+}
+
+export type UtilisateurUpdateOneRequiredWithoutRealisationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UtilisateurCreateWithoutRealisationsInput, Prisma.UtilisateurUncheckedCreateWithoutRealisationsInput>
+  connectOrCreate?: Prisma.UtilisateurCreateOrConnectWithoutRealisationsInput
+  upsert?: Prisma.UtilisateurUpsertWithoutRealisationsInput
+  connect?: Prisma.UtilisateurWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UtilisateurUpdateToOneWithWhereWithoutRealisationsInput, Prisma.UtilisateurUpdateWithoutRealisationsInput>, Prisma.UtilisateurUncheckedUpdateWithoutRealisationsInput>
 }
 
 export type UtilisateurCreateNestedOneWithoutInterventionsInput = {
@@ -824,6 +845,7 @@ export type UtilisateurCreateWithoutActiviteInput = {
   interventions?: Prisma.InterventionCreateNestedManyWithoutTechnicienInput
   historiques?: Prisma.HistoriqueStatutCreateNestedManyWithoutUtilisateurInput
   avis?: Prisma.AvisCreateNestedManyWithoutTechnicienInput
+  realisations?: Prisma.RealisationCreateNestedManyWithoutUtilisateurInput
 }
 
 export type UtilisateurUncheckedCreateWithoutActiviteInput = {
@@ -850,6 +872,7 @@ export type UtilisateurUncheckedCreateWithoutActiviteInput = {
   interventions?: Prisma.InterventionUncheckedCreateNestedManyWithoutTechnicienInput
   historiques?: Prisma.HistoriqueStatutUncheckedCreateNestedManyWithoutUtilisateurInput
   avis?: Prisma.AvisUncheckedCreateNestedManyWithoutTechnicienInput
+  realisations?: Prisma.RealisationUncheckedCreateNestedManyWithoutUtilisateurInput
 }
 
 export type UtilisateurCreateOrConnectWithoutActiviteInput = {
@@ -905,6 +928,130 @@ export type UtilisateurScalarWhereInput = {
   photoMime?: Prisma.StringNullableFilter<"Utilisateur"> | string | null
 }
 
+export type UtilisateurCreateWithoutRealisationsInput = {
+  id?: string
+  nom: string
+  email: string
+  motDePasseHash: string
+  role?: $Enums.Role
+  actif?: boolean
+  createdAt?: Date | string
+  emailVerifieLe?: Date | string | null
+  jetonActivationHash?: string | null
+  jetonActivationExpire?: Date | string | null
+  profilPublic?: boolean
+  slug?: string | null
+  metier?: string | null
+  bio?: string | null
+  telephone?: string | null
+  whatsapp?: string | null
+  ville?: string | null
+  quartier?: string | null
+  photoChemin?: string | null
+  photoMime?: string | null
+  activite: Prisma.ActiviteCreateNestedOneWithoutUtilisateursInput
+  interventions?: Prisma.InterventionCreateNestedManyWithoutTechnicienInput
+  historiques?: Prisma.HistoriqueStatutCreateNestedManyWithoutUtilisateurInput
+  avis?: Prisma.AvisCreateNestedManyWithoutTechnicienInput
+}
+
+export type UtilisateurUncheckedCreateWithoutRealisationsInput = {
+  id?: string
+  activiteId: string
+  nom: string
+  email: string
+  motDePasseHash: string
+  role?: $Enums.Role
+  actif?: boolean
+  createdAt?: Date | string
+  emailVerifieLe?: Date | string | null
+  jetonActivationHash?: string | null
+  jetonActivationExpire?: Date | string | null
+  profilPublic?: boolean
+  slug?: string | null
+  metier?: string | null
+  bio?: string | null
+  telephone?: string | null
+  whatsapp?: string | null
+  ville?: string | null
+  quartier?: string | null
+  photoChemin?: string | null
+  photoMime?: string | null
+  interventions?: Prisma.InterventionUncheckedCreateNestedManyWithoutTechnicienInput
+  historiques?: Prisma.HistoriqueStatutUncheckedCreateNestedManyWithoutUtilisateurInput
+  avis?: Prisma.AvisUncheckedCreateNestedManyWithoutTechnicienInput
+}
+
+export type UtilisateurCreateOrConnectWithoutRealisationsInput = {
+  where: Prisma.UtilisateurWhereUniqueInput
+  create: Prisma.XOR<Prisma.UtilisateurCreateWithoutRealisationsInput, Prisma.UtilisateurUncheckedCreateWithoutRealisationsInput>
+}
+
+export type UtilisateurUpsertWithoutRealisationsInput = {
+  update: Prisma.XOR<Prisma.UtilisateurUpdateWithoutRealisationsInput, Prisma.UtilisateurUncheckedUpdateWithoutRealisationsInput>
+  create: Prisma.XOR<Prisma.UtilisateurCreateWithoutRealisationsInput, Prisma.UtilisateurUncheckedCreateWithoutRealisationsInput>
+  where?: Prisma.UtilisateurWhereInput
+}
+
+export type UtilisateurUpdateToOneWithWhereWithoutRealisationsInput = {
+  where?: Prisma.UtilisateurWhereInput
+  data: Prisma.XOR<Prisma.UtilisateurUpdateWithoutRealisationsInput, Prisma.UtilisateurUncheckedUpdateWithoutRealisationsInput>
+}
+
+export type UtilisateurUpdateWithoutRealisationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nom?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  motDePasseHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  actif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerifieLe?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  jetonActivationHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jetonActivationExpire?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profilPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telephone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ville?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quartier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoChemin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  activite?: Prisma.ActiviteUpdateOneRequiredWithoutUtilisateursNestedInput
+  interventions?: Prisma.InterventionUpdateManyWithoutTechnicienNestedInput
+  historiques?: Prisma.HistoriqueStatutUpdateManyWithoutUtilisateurNestedInput
+  avis?: Prisma.AvisUpdateManyWithoutTechnicienNestedInput
+}
+
+export type UtilisateurUncheckedUpdateWithoutRealisationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  activiteId?: Prisma.StringFieldUpdateOperationsInput | string
+  nom?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  motDePasseHash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  actif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerifieLe?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  jetonActivationHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jetonActivationExpire?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  profilPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telephone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ville?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quartier?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoChemin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interventions?: Prisma.InterventionUncheckedUpdateManyWithoutTechnicienNestedInput
+  historiques?: Prisma.HistoriqueStatutUncheckedUpdateManyWithoutUtilisateurNestedInput
+  avis?: Prisma.AvisUncheckedUpdateManyWithoutTechnicienNestedInput
+}
+
 export type UtilisateurCreateWithoutInterventionsInput = {
   id?: string
   nom: string
@@ -929,6 +1076,7 @@ export type UtilisateurCreateWithoutInterventionsInput = {
   activite: Prisma.ActiviteCreateNestedOneWithoutUtilisateursInput
   historiques?: Prisma.HistoriqueStatutCreateNestedManyWithoutUtilisateurInput
   avis?: Prisma.AvisCreateNestedManyWithoutTechnicienInput
+  realisations?: Prisma.RealisationCreateNestedManyWithoutUtilisateurInput
 }
 
 export type UtilisateurUncheckedCreateWithoutInterventionsInput = {
@@ -955,6 +1103,7 @@ export type UtilisateurUncheckedCreateWithoutInterventionsInput = {
   photoMime?: string | null
   historiques?: Prisma.HistoriqueStatutUncheckedCreateNestedManyWithoutUtilisateurInput
   avis?: Prisma.AvisUncheckedCreateNestedManyWithoutTechnicienInput
+  realisations?: Prisma.RealisationUncheckedCreateNestedManyWithoutUtilisateurInput
 }
 
 export type UtilisateurCreateOrConnectWithoutInterventionsInput = {
@@ -997,6 +1146,7 @@ export type UtilisateurUpdateWithoutInterventionsInput = {
   activite?: Prisma.ActiviteUpdateOneRequiredWithoutUtilisateursNestedInput
   historiques?: Prisma.HistoriqueStatutUpdateManyWithoutUtilisateurNestedInput
   avis?: Prisma.AvisUpdateManyWithoutTechnicienNestedInput
+  realisations?: Prisma.RealisationUpdateManyWithoutUtilisateurNestedInput
 }
 
 export type UtilisateurUncheckedUpdateWithoutInterventionsInput = {
@@ -1023,6 +1173,7 @@ export type UtilisateurUncheckedUpdateWithoutInterventionsInput = {
   photoMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   historiques?: Prisma.HistoriqueStatutUncheckedUpdateManyWithoutUtilisateurNestedInput
   avis?: Prisma.AvisUncheckedUpdateManyWithoutTechnicienNestedInput
+  realisations?: Prisma.RealisationUncheckedUpdateManyWithoutUtilisateurNestedInput
 }
 
 export type UtilisateurCreateWithoutHistoriquesInput = {
@@ -1049,6 +1200,7 @@ export type UtilisateurCreateWithoutHistoriquesInput = {
   activite: Prisma.ActiviteCreateNestedOneWithoutUtilisateursInput
   interventions?: Prisma.InterventionCreateNestedManyWithoutTechnicienInput
   avis?: Prisma.AvisCreateNestedManyWithoutTechnicienInput
+  realisations?: Prisma.RealisationCreateNestedManyWithoutUtilisateurInput
 }
 
 export type UtilisateurUncheckedCreateWithoutHistoriquesInput = {
@@ -1075,6 +1227,7 @@ export type UtilisateurUncheckedCreateWithoutHistoriquesInput = {
   photoMime?: string | null
   interventions?: Prisma.InterventionUncheckedCreateNestedManyWithoutTechnicienInput
   avis?: Prisma.AvisUncheckedCreateNestedManyWithoutTechnicienInput
+  realisations?: Prisma.RealisationUncheckedCreateNestedManyWithoutUtilisateurInput
 }
 
 export type UtilisateurCreateOrConnectWithoutHistoriquesInput = {
@@ -1117,6 +1270,7 @@ export type UtilisateurUpdateWithoutHistoriquesInput = {
   activite?: Prisma.ActiviteUpdateOneRequiredWithoutUtilisateursNestedInput
   interventions?: Prisma.InterventionUpdateManyWithoutTechnicienNestedInput
   avis?: Prisma.AvisUpdateManyWithoutTechnicienNestedInput
+  realisations?: Prisma.RealisationUpdateManyWithoutUtilisateurNestedInput
 }
 
 export type UtilisateurUncheckedUpdateWithoutHistoriquesInput = {
@@ -1143,6 +1297,7 @@ export type UtilisateurUncheckedUpdateWithoutHistoriquesInput = {
   photoMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   interventions?: Prisma.InterventionUncheckedUpdateManyWithoutTechnicienNestedInput
   avis?: Prisma.AvisUncheckedUpdateManyWithoutTechnicienNestedInput
+  realisations?: Prisma.RealisationUncheckedUpdateManyWithoutUtilisateurNestedInput
 }
 
 export type UtilisateurCreateWithoutAvisInput = {
@@ -1169,6 +1324,7 @@ export type UtilisateurCreateWithoutAvisInput = {
   activite: Prisma.ActiviteCreateNestedOneWithoutUtilisateursInput
   interventions?: Prisma.InterventionCreateNestedManyWithoutTechnicienInput
   historiques?: Prisma.HistoriqueStatutCreateNestedManyWithoutUtilisateurInput
+  realisations?: Prisma.RealisationCreateNestedManyWithoutUtilisateurInput
 }
 
 export type UtilisateurUncheckedCreateWithoutAvisInput = {
@@ -1195,6 +1351,7 @@ export type UtilisateurUncheckedCreateWithoutAvisInput = {
   photoMime?: string | null
   interventions?: Prisma.InterventionUncheckedCreateNestedManyWithoutTechnicienInput
   historiques?: Prisma.HistoriqueStatutUncheckedCreateNestedManyWithoutUtilisateurInput
+  realisations?: Prisma.RealisationUncheckedCreateNestedManyWithoutUtilisateurInput
 }
 
 export type UtilisateurCreateOrConnectWithoutAvisInput = {
@@ -1237,6 +1394,7 @@ export type UtilisateurUpdateWithoutAvisInput = {
   activite?: Prisma.ActiviteUpdateOneRequiredWithoutUtilisateursNestedInput
   interventions?: Prisma.InterventionUpdateManyWithoutTechnicienNestedInput
   historiques?: Prisma.HistoriqueStatutUpdateManyWithoutUtilisateurNestedInput
+  realisations?: Prisma.RealisationUpdateManyWithoutUtilisateurNestedInput
 }
 
 export type UtilisateurUncheckedUpdateWithoutAvisInput = {
@@ -1263,6 +1421,7 @@ export type UtilisateurUncheckedUpdateWithoutAvisInput = {
   photoMime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   interventions?: Prisma.InterventionUncheckedUpdateManyWithoutTechnicienNestedInput
   historiques?: Prisma.HistoriqueStatutUncheckedUpdateManyWithoutUtilisateurNestedInput
+  realisations?: Prisma.RealisationUncheckedUpdateManyWithoutUtilisateurNestedInput
 }
 
 export type UtilisateurCreateManyActiviteInput = {
@@ -1312,6 +1471,7 @@ export type UtilisateurUpdateWithoutActiviteInput = {
   interventions?: Prisma.InterventionUpdateManyWithoutTechnicienNestedInput
   historiques?: Prisma.HistoriqueStatutUpdateManyWithoutUtilisateurNestedInput
   avis?: Prisma.AvisUpdateManyWithoutTechnicienNestedInput
+  realisations?: Prisma.RealisationUpdateManyWithoutUtilisateurNestedInput
 }
 
 export type UtilisateurUncheckedUpdateWithoutActiviteInput = {
@@ -1338,6 +1498,7 @@ export type UtilisateurUncheckedUpdateWithoutActiviteInput = {
   interventions?: Prisma.InterventionUncheckedUpdateManyWithoutTechnicienNestedInput
   historiques?: Prisma.HistoriqueStatutUncheckedUpdateManyWithoutUtilisateurNestedInput
   avis?: Prisma.AvisUncheckedUpdateManyWithoutTechnicienNestedInput
+  realisations?: Prisma.RealisationUncheckedUpdateManyWithoutUtilisateurNestedInput
 }
 
 export type UtilisateurUncheckedUpdateManyWithoutActiviteInput = {
@@ -1372,12 +1533,14 @@ export type UtilisateurCountOutputType = {
   interventions: number
   historiques: number
   avis: number
+  realisations: number
 }
 
 export type UtilisateurCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   interventions?: boolean | UtilisateurCountOutputTypeCountInterventionsArgs
   historiques?: boolean | UtilisateurCountOutputTypeCountHistoriquesArgs
   avis?: boolean | UtilisateurCountOutputTypeCountAvisArgs
+  realisations?: boolean | UtilisateurCountOutputTypeCountRealisationsArgs
 }
 
 /**
@@ -1411,6 +1574,13 @@ export type UtilisateurCountOutputTypeCountAvisArgs<ExtArgs extends runtime.Type
   where?: Prisma.AvisWhereInput
 }
 
+/**
+ * UtilisateurCountOutputType without action
+ */
+export type UtilisateurCountOutputTypeCountRealisationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RealisationWhereInput
+}
+
 
 export type UtilisateurSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1438,6 +1608,7 @@ export type UtilisateurSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   interventions?: boolean | Prisma.Utilisateur$interventionsArgs<ExtArgs>
   historiques?: boolean | Prisma.Utilisateur$historiquesArgs<ExtArgs>
   avis?: boolean | Prisma.Utilisateur$avisArgs<ExtArgs>
+  realisations?: boolean | Prisma.Utilisateur$realisationsArgs<ExtArgs>
   _count?: boolean | Prisma.UtilisateurCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["utilisateur"]>
 
@@ -1521,6 +1692,7 @@ export type UtilisateurInclude<ExtArgs extends runtime.Types.Extensions.Internal
   interventions?: boolean | Prisma.Utilisateur$interventionsArgs<ExtArgs>
   historiques?: boolean | Prisma.Utilisateur$historiquesArgs<ExtArgs>
   avis?: boolean | Prisma.Utilisateur$avisArgs<ExtArgs>
+  realisations?: boolean | Prisma.Utilisateur$realisationsArgs<ExtArgs>
   _count?: boolean | Prisma.UtilisateurCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UtilisateurIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1537,6 +1709,7 @@ export type $UtilisateurPayload<ExtArgs extends runtime.Types.Extensions.Interna
     interventions: Prisma.$InterventionPayload<ExtArgs>[]
     historiques: Prisma.$HistoriqueStatutPayload<ExtArgs>[]
     avis: Prisma.$AvisPayload<ExtArgs>[]
+    realisations: Prisma.$RealisationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1958,6 +2131,7 @@ export interface Prisma__UtilisateurClient<T, Null = never, ExtArgs extends runt
   interventions<T extends Prisma.Utilisateur$interventionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Utilisateur$interventionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InterventionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   historiques<T extends Prisma.Utilisateur$historiquesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Utilisateur$historiquesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HistoriqueStatutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   avis<T extends Prisma.Utilisateur$avisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Utilisateur$avisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AvisPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  realisations<T extends Prisma.Utilisateur$realisationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Utilisateur$realisationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RealisationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2478,6 +2652,30 @@ export type Utilisateur$avisArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.AvisScalarFieldEnum | Prisma.AvisScalarFieldEnum[]
+}
+
+/**
+ * Utilisateur.realisations
+ */
+export type Utilisateur$realisationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Realisation
+   */
+  select?: Prisma.RealisationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Realisation
+   */
+  omit?: Prisma.RealisationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RealisationInclude<ExtArgs> | null
+  where?: Prisma.RealisationWhereInput
+  orderBy?: Prisma.RealisationOrderByWithRelationInput | Prisma.RealisationOrderByWithRelationInput[]
+  cursor?: Prisma.RealisationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RealisationScalarFieldEnum | Prisma.RealisationScalarFieldEnum[]
 }
 
 /**

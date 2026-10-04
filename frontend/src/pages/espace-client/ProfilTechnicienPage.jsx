@@ -19,6 +19,17 @@ function dateAvis(date) {
   return new Intl.DateTimeFormat('fr-CG', { dateStyle: 'medium' }).format(valeur)
 }
 
+function RetourAnnuaire() {
+  return (
+    <Link to="/techniciens" className="profil-technicien__retour">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      Retour à l’annuaire
+    </Link>
+  )
+}
+
 export default function ProfilTechnicienPage() {
   const { slug } = useParams()
   const [resultat, setResultat] = useState({ slug: null, technicien: null, erreur: '' })
@@ -50,7 +61,7 @@ export default function ProfilTechnicienPage() {
   if (chargement) {
     return (
       <main className="container profil-technicien">
-        <Link to="/techniciens" className="profil-technicien__retour">← Retour à l’annuaire</Link>
+        <RetourAnnuaire />
         <p className="profil-technicien__etat" role="status">Chargement du profil…</p>
       </main>
     )
@@ -60,7 +71,7 @@ export default function ProfilTechnicienPage() {
     const introuvable = erreur === 'introuvable'
     return (
       <main className="container profil-technicien">
-        <Link to="/techniciens" className="profil-technicien__retour">← Retour à l’annuaire</Link>
+        <RetourAnnuaire />
         <h1 className="page-title">{introuvable ? 'Technicien introuvable' : 'Profil indisponible'}</h1>
         <p className="profil-technicien__etat" role="alert">
           {introuvable ? 'Ce profil n’existe pas ou n’est pas public.' : erreur || 'Le profil ne peut pas être chargé.'}
@@ -82,11 +93,12 @@ export default function ProfilTechnicienPage() {
     noteMoyenne = 0,
     nbAvis = 0,
     avis = [],
+    realisations = [],
   } = technicien
 
   return (
     <main className="container profil-technicien">
-      <Link to="/techniciens" className="profil-technicien__retour">← Retour à l’annuaire</Link>
+      <RetourAnnuaire />
 
       <div className="profil-technicien__grille">
         <Card>
@@ -139,6 +151,22 @@ export default function ProfilTechnicienPage() {
           </Card>
         )}
       </div>
+
+      {realisations.length > 0 && (
+        <section className="profil-technicien__avis" aria-labelledby="realisations-titre">
+          <Card title={<span id="realisations-titre">Réalisations</span>}>
+            <ul className="profil-technicien__realisations">
+              {realisations.map((r) => (
+                <li key={r.id}>
+                  {r.photoUrl && <img src={r.photoUrl} alt={r.titre} loading="lazy" />}
+                  <strong>{r.titre}</strong>
+                  {r.description && <p>{r.description}</p>}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </section>
+      )}
 
       <section className="profil-technicien__avis" aria-labelledby="avis-titre">
         <Card title={<span id="avis-titre">Avis des clients</span>}>

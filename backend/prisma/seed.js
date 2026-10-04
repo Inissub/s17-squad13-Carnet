@@ -221,6 +221,7 @@ async function main() {
     [1, lignesPrises, jour(-4, 12), [[30000, jour(-4, 12), "ESPECES", null]]],
     [2, lignesHall, jour(-12, 14), []],
   ];
+  let recus = 0;
   for (const [i, [d, lignes, dateEmission, paiements]] of facturesDonnees.entries()) {
     const echeance = new Date(dateEmission);
     echeance.setDate(echeance.getDate() + 7);
@@ -234,7 +235,14 @@ async function main() {
         dateEcheance: echeance,
         lignes: { create: versLignes(lignes) },
         paiements: {
-          create: paiements.map(([montant, date, mode, ref]) => ({ activiteId: activite.id, montant, date, mode, reference: ref })),
+          create: paiements.map(([montant, date, mode, ref]) => ({
+            activiteId: activite.id,
+            montant,
+            date,
+            mode,
+            reference: ref,
+            numeroRecu: reference("REC", ++recus),
+          })),
         },
       },
     });
@@ -264,6 +272,7 @@ async function main() {
       { activiteId: activite.id, type: "INTERVENTION", annee: ANNEE, valeur: donnees.length },
       { activiteId: activite.id, type: "DEVIS", annee: ANNEE, valeur: devisDonnees.length },
       { activiteId: activite.id, type: "FACTURE", annee: ANNEE, valeur: facturesDonnees.length },
+      { activiteId: activite.id, type: "RECU", annee: ANNEE, valeur: recus },
     ],
   });
 

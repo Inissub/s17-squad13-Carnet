@@ -5,6 +5,8 @@
 
 .profil-technicien__retour {
   display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   margin-bottom: var(--space-4);
   color: var(--muted);
   text-decoration: none;
@@ -175,4 +177,35 @@
     align-items: flex-start;
     flex-direction: column;
   }
+}
+
+/* Réalisations du technicien */
+.profil-technicien__realisations {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.profil-technicien__realisations li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: 14px;
+}
+
+.profil-technicien__realisations img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  margin-bottom: var(--space-1);
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background: var(--bg);
+}
+
+.profil-technicien__realisations p {
+  color: var(--muted);
+  font-size: 13px;
 }

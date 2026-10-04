@@ -11,3 +11,10 @@ export function ProtectedRoute() {
   if (user.type === 'client') return <Navigate to="/client" replace />
   return <Outlet />
 }
+
+// Pages réservées au responsable de l'activité (clients, facturation) : un technicien revient au tableau de bord
+export function ResponsableRoute() {
+  const { user } = useAuth()
+  if (user?.role !== 'RESPONSABLE') return <Navigate to="/dashboard" replace />
+  return <Outlet />
+}

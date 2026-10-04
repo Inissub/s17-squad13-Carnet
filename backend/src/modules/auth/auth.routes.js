@@ -1,4 +1,3 @@
-import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import { Router } from "express";
 import { z } from "zod";
@@ -6,6 +5,7 @@ import { env } from "../../config/env.js";
 import { prisma } from "../../db/prisma.js";
 import { requireAuth } from "../../middleware/auth.js";
 import { HttpError } from "../../utils/httpError.js";
+import { empreinte, nouveauJeton } from "../../utils/jetons.js";
 import { envoyerMail, mailActivation } from "../../utils/mail.js";
 import { fermerSession, ouvrirSession } from "../../utils/session.js";
 
@@ -73,21 +73,8 @@ async function emailPris(adresse) {
 }
 
 // ——— Activation par e-mail ———
-// Seule l'empreinte SHA-256 du jeton est stockée : une fuite de la base ne permet pas d'activer un compte.
 
 const VALIDITE_HEURES = 24;
-const empreinte = (jeton) => crypto.createHash("sha256").update(jeton).digest("hex");
-
-function nouveauJeton() {
-  const jeton = crypto.randomBytes(32).toString("base64url");
-  return {
-    jeton,
-    data: {
-      jetonActivationHash: empreinte(jeton),
-      jetonActivationExpire: new Date(Date.now() + VALIDITE_HEURES * 3600 * 1000),
-    },
-  };
-}
 
 async function envoyerActivation({ nom, email: destinataire }, jeton) {
   const lien = `${env.CLIENT_URL}/activation?jeton=${jeton}`;
@@ -116,7 +103,7 @@ authRouter.post("/inscription", async (req, res) => {
 
   const motDePasseHash = await bcrypt.hash(data.motDePasse, 12);
   const { nom, telephone, ville } = data;
-  const { jeton, data: activation } = nouveauJeton();
+  const { jeton, data: activation } = nouveauJeton(VALIDITE_HEURES);
 
   if (data.type === "client") {
     await prisma.compteClient.create({
@@ -195,12 +182,58 @@ authRouter.post("/activation/renvoyer", async (req, res) => {
 
   const trouve = await compteNonActive({ email: adresse });
   if (trouve) {
-    const { jeton, data } = nouveauJeton();
+    const { jeton, data } = nouveauJeton(VALIDITE_HEURES);
     await trouve.modele.update({ where: { id: trouve.compte.id }, data });
     await envoyerActivation(trouve.compte, jeton);
   }
 
   res.json({ message: "Si un compte non activé existe pour cette adresse, un nouveau lien vient d'être envoyé." });
+});
+
+// Lien d'invitation (technicien créé par le responsable) ou de nouveau mot de passe :
+// la personne choisit son mot de passe, le compte est activé et la session ouverte
+const invitationSchema = z.object({
+  jeton: z.string().min(1, "Lien invalide"),
+  motDePasse: z.string().min(8, "Le mot de passe doit faire au moins 8 caractères"),
+});
+
+authRouter.post("/invitation", async (req, res) => {
+  const { jeton, motDePasse } = invitationSchema.parse(req.body);
+  const user = await prisma.utilisateur.findFirst({ where: { jetonActivationHash: empreinte(jeton) } });
+  if (!user || user.jetonActivationExpire < new Date()) {
+    throw new HttpError(400, "Ce lien est invalide ou a expiré. Demandez-en un nouveau à votre responsable.", "JETON_INVALIDE");
+  }
+  if (!user.actif) throw new HttpError(403, "Ce compte est désactivé");
+
+  await prisma.utilisateur.update({
+    where: { id: user.id },
+    data: {
+      motDePasseHash: await bcrypt.hash(motDePasse, 12),
+      emailVerifieLe: user.emailVerifieLe ?? new Date(),
+      jetonActivationHash: null,
+      jetonActivationExpire: null,
+    },
+  });
+
+  const session = sessionPro(user);
+  ouvrirSession(res, session);
+  res.json(await profil(session));
+});
+
+const motDePasseSchema = z.object({
+  actuel: z.string().min(1, "Mot de passe actuel requis"),
+  nouveau: z.string().min(8, "Le nouveau mot de passe doit faire au moins 8 caractères"),
+});
+
+authRouter.put("/mot-de-passe", requireAuth, async (req, res) => {
+  const { actuel, nouveau } = motDePasseSchema.parse(req.body);
+  const modele = req.user.role === "CLIENT" ? prisma.compteClient : prisma.utilisateur;
+  const compte = await modele.findUnique({ where: { id: req.user.id } });
+  if (!compte || !(await bcrypt.compare(actuel, compte.motDePasseHash))) {
+    throw new HttpError(400, "Le mot de passe actuel est incorrect");
+  }
+  await modele.update({ where: { id: compte.id }, data: { motDePasseHash: await bcrypt.hash(nouveau, 12) } });
+  res.status(204).end();
 });
 
 authRouter.post("/deconnexion", (req, res) => {

@@ -21,4 +21,7 @@ function accepter(types, tailleMax) {
 
 export const uploadImage = accepter(IMAGES, 5 * Mo);
 
+// Logo de l'activité : PNG ou JPEG uniquement, les seuls formats que les PDF savent intégrer
+export const uploadLogo = accepter(["image/png", "image/jpeg"], 2 * Mo);
+
 export const uploadDocument = accepter(DOCUMENTS, 10 * Mo);

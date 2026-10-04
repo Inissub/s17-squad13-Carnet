@@ -72,3 +72,45 @@ Ce lien est valable ${heures} heures. Si vous n'êtes pas à l'origine de cette 
 
   return { subject, text, html };
 }
+
+// Invitation d'un technicien par le responsable : il choisit son mot de passe en activant son compte
+export function mailInvitation({ nom, activite, invitePar, lien, heures }) {
+  const subject = `${activite} vous invite sur ${APP}`;
+  const text = `Bonjour ${nom},
+
+${invitePar} vous a ajouté à l'équipe de ${activite} sur ${APP}. Pour activer votre compte et choisir votre mot de passe, ouvrez ce lien :
+${lien}
+
+Ce lien est valable ${heures} heures. Vous retrouverez ensuite les interventions qui vous sont attribuées.`;
+
+  const html = gabarit(`
+          <p style="margin:0 0 16px">Bonjour ${echapper(nom)},</p>
+          <p style="margin:0 0 24px"><strong>${echapper(invitePar)}</strong> vous a ajouté à l'équipe de <strong>${echapper(activite)}</strong> sur ${APP}. Activez votre compte et choisissez votre mot de passe :</p>
+          <p style="margin:0 0 24px">
+            <a href="${lien}" style="display:inline-block;background:#db0000;color:#ffffff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">Activer mon compte</a>
+          </p>
+          <p style="margin:0;color:#6b6b6b;font-size:13px">Ce lien est valable ${heures} heures. Vous retrouverez ensuite les interventions qui vous sont attribuées.</p>`);
+
+  return { subject, text, html };
+}
+
+// Nouveau mot de passe demandé par le responsable pour un membre de l'équipe
+export function mailNouveauMotDePasse({ nom, activite, lien, heures }) {
+  const subject = `Choisissez un nouveau mot de passe ${APP}`;
+  const text = `Bonjour ${nom},
+
+Le responsable de ${activite} vous permet de choisir un nouveau mot de passe. Ouvrez ce lien :
+${lien}
+
+Ce lien est valable ${heures} heures. Tant que vous ne l'utilisez pas, votre mot de passe actuel reste valable.`;
+
+  const html = gabarit(`
+          <p style="margin:0 0 16px">Bonjour ${echapper(nom)},</p>
+          <p style="margin:0 0 24px">Le responsable de <strong>${echapper(activite)}</strong> vous permet de choisir un nouveau mot de passe.</p>
+          <p style="margin:0 0 24px">
+            <a href="${lien}" style="display:inline-block;background:#db0000;color:#ffffff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">Choisir mon mot de passe</a>
+          </p>
+          <p style="margin:0;color:#6b6b6b;font-size:13px">Ce lien est valable ${heures} heures. Tant que vous ne l'utilisez pas, votre mot de passe actuel reste valable.</p>`);
+
+  return { subject, text, html };
+}

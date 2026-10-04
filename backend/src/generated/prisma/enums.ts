@@ -80,7 +80,8 @@ export type ModePaiement = (typeof ModePaiement)[keyof typeof ModePaiement]
 export const TypeReference = {
   INTERVENTION: 'INTERVENTION',
   DEVIS: 'DEVIS',
-  FACTURE: 'FACTURE'
+  FACTURE: 'FACTURE',
+  RECU: 'RECU'
 } as const
 
 export type TypeReference = (typeof TypeReference)[keyof typeof TypeReference]
