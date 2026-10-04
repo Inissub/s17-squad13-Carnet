@@ -117,14 +117,14 @@ function Logo({ activite, onChange }) {
 
   return (
     <Card className="activite__carte" title="Logo">
-      <div className="logo">
-        <div className="logo__cadre">
+      <div className="logo-activite">
+        <div className="logo-activite__cadre">
           {activite.logoUrl ? <img src={activite.logoUrl} alt={`Logo de ${activite.nom}`} /> : <span className="muted">Aucun logo</span>}
         </div>
-        <p className="muted logo__aide">Affiché en en-tête des devis, factures et rapports. PNG ou JPEG, 2 Mo maximum.</p>
+        <p className="muted logo-activite__aide">Affiché en en-tête des devis, factures et rapports. PNG ou JPEG, 2 Mo maximum.</p>
         {erreur && <p className="field__error">{erreur}</p>}
         <input ref={entree} type="file" accept="image/png,image/jpeg" hidden onChange={envoyer} />
-        <div className="logo__actions">
+        <div className="logo-activite__actions">
           <Button variant="secondary" size="sm" onClick={() => entree.current?.click()} disabled={envoi}>
             {envoi ? 'Envoi…' : activite.logoUrl ? 'Changer le logo' : '+ Ajouter un logo'}
           </Button>
