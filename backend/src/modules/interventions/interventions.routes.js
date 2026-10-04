@@ -1,30 +1,228 @@
 import { Router } from "express";
+import { z } from "zod";
 import { prisma } from "../../db/prisma.js";
+import { requireRole } from "../../middleware/auth.js";
+import { HttpError, notFound } from "../../utils/httpError.js";
 
 export const interventionsRouter = Router();
 
+const optionnel = z.preprocess((v) => (v === "" ? undefined : v), z.string().trim().optional());
+
+// Le client vient soit d'une fiche de l'activité, soit d'un compte client inscrit
+const champs = z.object({
+  clientId: optionnel,
+  compteClientId: optionnel,
+  objet: z.string().trim().min(3, "Objet trop court"),
+  priorite: z.enum(["BASSE", "NORMALE", "HAUTE", "URGENTE"]).default("NORMALE"),
+  datePrevue: z.preprocess((v) => (v === "" || v == null ? undefined : v), z.coerce.date().optional()),
+  dureeMinutes: z.preprocess(
+    (v) => (v === "" || v == null ? undefined : v),
+    z.coerce.number().int().positive("Durée invalide").optional(),
+  ),
+  technicienId: optionnel,
+  adresse: optionnel,
+  description: optionnel,
+});
+
+const unSeulClient = [
+  (d) => Boolean(d.clientId) !== Boolean(d.compteClientId),
+  { message: "Client requis", path: ["clientId"] },
+];
+
+const statut = z.enum(["A_PLANIFIER", "PLANIFIEE", "EN_COURS", "TERMINEE", "ANNULEE"]);
+
+// À la création, le statut est déduit de la date s'il n'est pas fourni
+const creationSchema = champs.extend({ statut: statut.optional() }).refine(...unSeulClient);
+const modificationSchema = champs.extend({ statut }).refine(...unSeulClient);
+
+const listeSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  taille: z.coerce.number().int().min(1).max(100).default(20),
+  statut: statut.optional().catch(undefined),
+  q: z.string().trim().optional(),
+  // Bornes de la journée filtrée, calculées par le navigateur dans son fuseau
+  du: z.coerce.date().optional(),
+  au: z.coerce.date().optional(),
+});
+
+const selectListe = {
+  id: true,
+  reference: true,
+  objet: true,
+  adresse: true,
+  priorite: true,
+  statut: true,
+  datePrevue: true,
+  client: { select: { id: true, nom: true } },
+  technicien: { select: { id: true, nom: true } },
+};
+
+// Un technicien n'a accès qu'aux interventions qui lui sont attribuées
+const perimetre = ({ id, activiteId, role }) => ({ activiteId, ...(role === "TECHNICIEN" && { technicienId: id }) });
+
+async function trouverIntervention(tx, user, id) {
+  const intervention = await tx.intervention.findFirst({ where: { id, ...perimetre(user) } });
+  if (!intervention) throw notFound("Intervention");
+  return intervention;
+}
+
+// Fiche client de l'activité à utiliser ; un compte inscrit reçoit sa fiche au premier travail
+async function resoudreClient(tx, activiteId, data, clientActuelId) {
+  if (data.clientId) {
+    const client = await tx.client.findFirst({
+      // Une fiche archivée reste acceptée si l'intervention y est déjà rattachée
+      where: { id: data.clientId, activiteId, ...(data.clientId !== clientActuelId && { archive: false }) },
+    });
+    if (!client) throw new HttpError(400, "Client introuvable");
+    return client;
+  }
+  const compte = await tx.compteClient.findFirst({ where: { id: data.compteClientId, emailVerifieLe: { not: null } } });
+  if (!compte) throw new HttpError(400, "Compte client introuvable");
+  return (
+    (await tx.client.findFirst({ where: { activiteId, compteClientId: compte.id } })) ??
+    (await tx.client.create({
+      data: { activiteId, nom: compte.nom, telephone: compte.telephone, compteClientId: compte.id },
+    }))
+  );
+}
+
+async function verifierTechnicien(tx, activiteId, technicienId) {
+  if (!technicienId) return;
+  const technicien = await tx.utilisateur.findFirst({ where: { id: technicienId, activiteId, actif: true } });
+  if (!technicien) throw new HttpError(400, "Technicien introuvable");
+}
+
 interventionsRouter.get("/", async (req, res) => {
-  const { id, activiteId, role } = req.user;
+  const { page, taille, statut, q, du, au } = listeSchema.parse(req.query);
+  const base = perimetre(req.user);
+  const where = {
+    ...base,
+    ...(statut && { statut }),
+    ...((du || au) && { datePrevue: { ...(du && { gte: du }), ...(au && { lt: au }) } }),
+    ...(q && {
+      OR: [
+        { objet: { contains: q, mode: "insensitive" } },
+        { reference: { contains: q, mode: "insensitive" } },
+        { client: { nom: { contains: q, mode: "insensitive" } } },
+      ],
+    }),
+  };
+
+  // Les compteurs des onglets portent sur toutes les interventions, quels que soient les filtres
+  const [total, parStatut] = await Promise.all([
+    prisma.intervention.count({ where }),
+    prisma.intervention.groupBy({ by: ["statut"], where: base, _count: { _all: true } }),
+  ]);
+  const pages = Math.max(1, Math.ceil(total / taille));
+  // Après une suppression, la page demandée peut ne plus exister
+  const pageCourante = Math.min(page, pages);
 
   const interventions = await prisma.intervention.findMany({
-    where: {
-      activiteId,
-      // Un technicien ne voit que les interventions qui lui sont attribuées
-      ...(role === "TECHNICIEN" && { technicienId: id }),
-    },
-    select: {
-      id: true,
-      reference: true,
-      objet: true,
-      adresse: true,
-      priorite: true,
-      statut: true,
-      datePrevue: true,
-      client: { select: { id: true, nom: true } },
-      technicien: { select: { id: true, nom: true } },
-    },
-    orderBy: [{ datePrevue: { sort: "asc", nulls: "last" } }, { createdAt: "desc" }],
+    where,
+    select: selectListe,
+    orderBy: [{ datePrevue: { sort: "asc", nulls: "last" } }, { createdAt: "desc" }, { id: "asc" }],
+    skip: (pageCourante - 1) * taille,
+    take: taille,
   });
 
-  res.json(interventions);
+  res.json({
+    interventions,
+    total,
+    page: pageCourante,
+    pages,
+    taille,
+    compteurs: Object.fromEntries(parStatut.map((g) => [g.statut, g._count._all])),
+  });
+});
+
+interventionsRouter.get("/:id", async (req, res) => {
+  const intervention = await prisma.intervention.findFirst({
+    where: { id: req.params.id, ...perimetre(req.user) },
+    select: { ...selectListe, description: true, dureeMinutes: true },
+  });
+  if (!intervention) throw notFound("Intervention");
+  res.json(intervention);
+});
+
+interventionsRouter.post("/", async (req, res) => {
+  const { id: utilisateurId, activiteId } = req.user;
+  const data = creationSchema.parse(req.body);
+
+  const intervention = await prisma.$transaction(async (tx) => {
+    const client = await resoudreClient(tx, activiteId, data);
+    await verifierTechnicien(tx, activiteId, data.technicienId);
+
+    const annee = new Date().getFullYear();
+    const { valeur } = await tx.compteur.upsert({
+      where: { activiteId_type_annee: { activiteId, type: "INTERVENTION", annee } },
+      create: { activiteId, type: "INTERVENTION", annee, valeur: 1 },
+      update: { valeur: { increment: 1 } },
+    });
+
+    const statut = data.statut ?? (data.datePrevue ? "PLANIFIEE" : "A_PLANIFIER");
+    return tx.intervention.create({
+      data: {
+        activiteId,
+        reference: `INT-${annee}-${String(valeur).padStart(4, "0")}`,
+        clientId: client.id,
+        technicienId: data.technicienId ?? null,
+        objet: data.objet,
+        description: data.description,
+        adresse: data.adresse ?? client.adresse,
+        priorite: data.priorite,
+        statut,
+        datePrevue: data.datePrevue,
+        dureeMinutes: data.dureeMinutes,
+        historiques: { create: { nouveauStatut: statut, utilisateurId } },
+      },
+      select: selectListe,
+    });
+  });
+
+  res.status(201).json(intervention);
+});
+
+interventionsRouter.put("/:id", async (req, res) => {
+  const { id: utilisateurId, activiteId, role } = req.user;
+  const data = modificationSchema.parse(req.body);
+
+  const intervention = await prisma.$transaction(async (tx) => {
+    const actuelle = await trouverIntervention(tx, req.user, req.params.id);
+    const client = await resoudreClient(tx, activiteId, data, actuelle.clientId);
+    // Un technicien ne peut pas réattribuer l'intervention à quelqu'un d'autre
+    const technicienId = role === "TECHNICIEN" ? actuelle.technicienId : (data.technicienId ?? null);
+    await verifierTechnicien(tx, activiteId, technicienId);
+
+    return tx.intervention.update({
+      where: { id: actuelle.id },
+      data: {
+        clientId: client.id,
+        technicienId,
+        objet: data.objet,
+        description: data.description ?? null,
+        adresse: data.adresse ?? client.adresse,
+        priorite: data.priorite,
+        statut: data.statut,
+        datePrevue: data.datePrevue ?? null,
+        dureeMinutes: data.dureeMinutes ?? null,
+        ...(data.statut !== actuelle.statut && {
+          historiques: { create: { ancienStatut: actuelle.statut, nouveauStatut: data.statut, utilisateurId } },
+        }),
+      },
+      select: selectListe,
+    });
+  });
+
+  res.json(intervention);
+});
+
+interventionsRouter.delete("/:id", requireRole("RESPONSABLE"), async (req, res) => {
+  const intervention = await trouverIntervention(prisma, req.user, req.params.id);
+  // Une facture est une pièce comptable : on ne la supprime pas avec l'intervention
+  const factures = await prisma.facture.count({ where: { interventionId: intervention.id } });
+  if (factures > 0) {
+    throw new HttpError(409, "Cette intervention a été facturée : elle ne peut pas être supprimée. Annulez-la plutôt.");
+  }
+  await prisma.intervention.delete({ where: { id: intervention.id } });
+  res.status(204).end();
 });

@@ -4,6 +4,32 @@
   gap: var(--space-5);
 }
 
+/* En-tête fixé sous la barre du haut du dashboard */
+.interventions__entete {
+  position: sticky;
+  top: var(--header-height);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: calc(-1 * var(--space-5));
+  padding: var(--space-5) 0 var(--space-3);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+
+.interventions__barre {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.interventions__barre .interventions__filtres {
+  min-width: 0;
+}
+
 .interventions__header {
   display: flex;
   align-items: flex-start;
@@ -81,6 +107,69 @@
   flex-wrap: wrap;
 }
 
+.interventions__outils {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* Filtre par date prévue */
+.filtre-date {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--muted);
+}
+
+.filtre-date:focus-within {
+  border-color: var(--ink);
+}
+
+.filtre-date input {
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.filtre-date__effacer {
+  margin-left: var(--space-1);
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.filtre-date__effacer:hover {
+  color: var(--ink);
+}
+
+/* Formulaire de création */
+.nouvelle-intervention__grille {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.nouvelle-intervention__plein,
+.nouvelle-intervention__actions {
+  grid-column: 1 / -1;
+}
+
+.nouvelle-intervention__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .recherche {
   display: flex;
   align-items: center;
@@ -154,19 +243,6 @@
   white-space: nowrap;
 }
 
-.interventions__date strong,
-.interventions__date span {
-  display: block;
-}
-
-.interventions__date strong {
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.interventions__date span {
-  font-size: 12px;
-}
 
 .interventions__objet {
   font-weight: 500;
@@ -203,7 +279,108 @@
   color: var(--accent);
 }
 
+/* Actions de ligne : modifier, supprimer */
+.interventions__actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.interventions__action {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.interventions__action:hover,
+.interventions__action:focus-visible {
+  background: var(--line);
+  color: var(--ink);
+  outline: none;
+}
+
+.interventions__action--danger:hover,
+.interventions__action--danger:focus-visible {
+  color: var(--err);
+}
+
+.interventions__confirmation {
+  display: inline-flex;
+  gap: var(--space-1);
+}
+
+.interventions__erreur {
+  display: block;
+  max-width: 220px;
+  margin-top: var(--space-1);
+  font-size: 12px;
+  color: var(--err);
+  white-space: normal;
+  text-align: right;
+}
+
+/* Pagination sous le tableau */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.pagination__boutons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.pagination__page {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  /* Le contenu du dashboard a un padding réduit à cette largeur */
+  .interventions__entete {
+    margin-top: calc(-1 * var(--space-4));
+    padding-top: var(--space-4);
+  }
+
+  .nouvelle-intervention__grille {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 600px) {
+  /* Sur petit écran, l'en-tête complet prendrait trop de hauteur : il défile avec la page */
+  .interventions__entete {
+    position: static;
+    margin-top: 0;
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .nouvelle-intervention__grille {
+    grid-template-columns: 1fr;
+  }
+
+  .interventions__outils,
+  .filtre-date {
+    width: 100%;
+  }
+
+  .filtre-date input {
+    flex: 1;
+  }
+
   .interventions__title {
     font-size: 24px;
   }
