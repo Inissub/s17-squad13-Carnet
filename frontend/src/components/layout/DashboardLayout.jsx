@@ -3,13 +3,14 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { Logo } from './Logo.jsx'
 import './DashboardLayout.css'
 
+// Un technicien ne voit que son travail : ni le carnet de clients, ni la facturation
 const MENU = [
   { to: '/dashboard', label: 'Dashboard', end: true },
   { to: '/dashboard/interventions', label: 'Interventions' },
-  { to: '/dashboard/clients', label: 'Clients' },
-  { to: '/dashboard/facturation', label: 'Facturation' },
+  { to: '/dashboard/clients', label: 'Clients', responsable: true },
+  { to: '/dashboard/facturation', label: 'Facturation', responsable: true },
   { to: '/dashboard/profil-public', label: 'Mon profil public' },
-  { to: '/dashboard/profil-activite', label: "Profil de l'activité" },
+  { to: '/dashboard/profil-activite', label: "Profil de l'activité", technicien: 'Mon compte' },
 ]
 
 const linkClass = ({ isActive }) => `dashboard-nav__link ${isActive ? 'dashboard-nav__link--active' : ''}`
@@ -24,9 +25,9 @@ export function DashboardLayout() {
           <Logo to="/dashboard" />
         </div>
         <nav className="dashboard-nav">
-          {MENU.map((item) => (
+          {MENU.filter((item) => !item.responsable || user?.role === 'RESPONSABLE').map((item) => (
             <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
-              {item.label}
+              {user?.role === 'TECHNICIEN' && item.technicien ? item.technicien : item.label}
             </NavLink>
           ))}
         </nav>

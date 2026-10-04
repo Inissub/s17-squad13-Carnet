@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Badge } from '../../components/ui/Badge.jsx'
 import { Button } from '../../components/ui/Button.jsx'
 import { Card } from '../../components/ui/Card.jsx'
+import { useAuth } from '../../context/AuthContext.jsx'
 import { useFetch } from '../../hooks/useFetch.js'
 import { formatMontant } from '../../utils/format.js'
 import { getStatut } from '../../utils/interventions.js'
@@ -174,6 +175,7 @@ function RepartitionStatuts({ compteurs, total }) {
 }
 
 export default function DashboardPage() {
+  const { user } = useAuth()
   // Calculé une fois : la requête ne doit pas changer à chaque rendu
   const [depuis] = useState(debutDuJour)
   const { data, error, reload } = useFetch(`/dashboard?depuis=${encodeURIComponent(depuis)}`)
@@ -184,12 +186,14 @@ export default function DashboardPage() {
         <h1 className="accueil__titre">Aujourd'hui</h1>
         <p className="muted">{aujourdHui.format(new Date())}</p>
       </div>
-      <Link to="/dashboard/interventions" state={{ nouvelle: true }} className="btn btn--primary btn--md">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-        Nouvelle intervention
-      </Link>
+      {user?.role === 'RESPONSABLE' && (
+        <Link to="/dashboard/interventions" state={{ nouvelle: true }} className="btn btn--primary btn--md">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Nouvelle intervention
+        </Link>
+      )}
     </header>
   )
 

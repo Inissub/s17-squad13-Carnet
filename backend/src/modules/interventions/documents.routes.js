@@ -4,6 +4,7 @@ import { prisma } from "../../db/prisma.js";
 import { requireRole } from "../../middleware/auth.js";
 import { HttpError, notFound } from "../../utils/httpError.js";
 import {
+  avecLogo,
   blocClient,
   blocPaiements,
   entete,
@@ -145,7 +146,7 @@ async function chargerPourPdf(req) {
     include: { client: true, activite: true, technicien: { select: { nom: true } } },
   });
   if (!intervention) throw notFound("Intervention");
-  return intervention;
+  return { ...intervention, activite: await avecLogo(intervention.activite) };
 }
 
 documentsRouter.get("/devis/:devisId/pdf", async (req, res) => {

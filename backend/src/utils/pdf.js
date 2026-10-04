@@ -1,4 +1,5 @@
 import PDFDocument from "pdfkit";
+import { BUCKETS, lireFichier } from "./stockage.js";
 
 const MARGE = 50;
 const ENCRE = "#1a1a1a";
@@ -35,10 +36,26 @@ function verifierPlace(doc, hauteur) {
   if (doc.y + hauteur > doc.page.height - MARGE) doc.addPage();
 }
 
-// En-tête : coordonnées de l'activité à gauche, type et référence du document à droite
+// Charge le logo de l'activité (bucket public) pour l'en-tête ; un logo illisible n'empêche pas le PDF
+export async function avecLogo(activite) {
+  if (!activite.logoChemin) return { ...activite, logo: null };
+  const logo = await lireFichier(BUCKETS.public, activite.logoChemin).catch(() => null);
+  return { ...activite, logo };
+}
+
+// En-tête : logo et coordonnées de l'activité à gauche, type et référence du document à droite
 export function entete(doc, activite, { titre, reference, dateDocument }) {
   const haut = doc.y;
-  doc.font("Helvetica-Bold").fontSize(16).fillColor(ENCRE).text(propre(activite.nom), MARGE, haut, { width: 280 });
+  let yTexte = haut;
+  if (activite.logo) {
+    try {
+      doc.image(activite.logo, MARGE, haut, { fit: [150, 56] });
+      yTexte = haut + 64;
+    } catch {
+      // Image non reconnue par pdfkit : l'en-tête s'affiche sans logo
+    }
+  }
+  doc.font("Helvetica-Bold").fontSize(16).fillColor(ENCRE).text(propre(activite.nom), MARGE, yTexte, { width: 280 });
   doc.font("Helvetica").fontSize(9).fillColor(GRIS);
   [activite.adresse, activite.telephone, activite.infosFacturation].filter(Boolean).forEach((ligne) => {
     doc.text(propre(ligne), { width: 280 });

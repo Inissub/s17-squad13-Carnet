@@ -125,7 +125,8 @@ interventionsRouter.get("/", async (req, res) => {
   });
 });
 
-interventionsRouter.post("/", async (req, res) => {
+// Seul le responsable crée des interventions ; un technicien travaille sur celles qui lui sont attribuées
+interventionsRouter.post("/", requireRole("RESPONSABLE"), async (req, res) => {
   const { id: utilisateurId, activiteId } = req.user;
   const data = creationSchema.parse(req.body);
 

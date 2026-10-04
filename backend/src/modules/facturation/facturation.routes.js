@@ -4,7 +4,7 @@ import { prisma } from "../../db/prisma.js";
 import { requireRole } from "../../middleware/auth.js";
 import { HttpError, notFound } from "../../utils/httpError.js";
 import { montantEnLettres } from "../../utils/lettres.js";
-import { blocClient, corpsRecu, entete, formatDate, ouvrirPdf } from "../../utils/pdf.js";
+import { avecLogo, blocClient, corpsRecu, entete, formatDate, ouvrirPdf } from "../../utils/pdf.js";
 import { prochaineReference } from "../interventions/references.js";
 import { arrondi, soldes } from "./soldes.js";
 
@@ -126,7 +126,8 @@ facturationRouter.get("/paiements/:id/recu", async (req, res) => {
   });
   if (!paiement) throw notFound("Paiement");
 
-  const { facture, activite } = paiement;
+  const { facture } = paiement;
+  const activite = await avecLogo(paiement.activite);
   const anterieur = (p) => p.createdAt < paiement.createdAt || (p.createdAt.getTime() === paiement.createdAt.getTime() && p.id <= paiement.id);
   const total = soldes({ lignes: facture.lignes, paiements: [] }).total;
   const paye = arrondi(facture.paiements.filter(anterieur).reduce((s, p) => s + Number(p.montant), 0));

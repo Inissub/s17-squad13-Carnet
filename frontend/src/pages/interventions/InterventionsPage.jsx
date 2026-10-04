@@ -117,7 +117,9 @@ export default function InterventionsPage() {
   const location = useLocation()
   // null : fermé ; 'nouvelle' : création ; sinon id de l'intervention modifiée.
   // Le bouton « Nouvelle intervention » du tableau de bord arrive ici avec le formulaire ouvert.
-  const [formulaire, setFormulaire] = useState(() => (location.state?.nouvelle ? 'nouvelle' : null))
+  const [formulaire, setFormulaire] = useState(() =>
+    location.state?.nouvelle && user?.role === 'RESPONSABLE' ? 'nouvelle' : null,
+  )
 
   const { data, loading, error, reload } = useFetch(cheminListe({ page, statut: statutActif, q, du, au }))
   const visibles = data?.interventions ?? []
@@ -172,12 +174,15 @@ export default function InterventionsPage() {
               {loading && !data ? 'Chargement…' : `${totalGlobal} intervention${totalGlobal > 1 ? 's' : ''} au total`}
             </p>
           </div>
-          <Button onClick={() => ouvrirFormulaire('nouvelle')} disabled={formulaire === 'nouvelle'}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Nouvelle intervention
-          </Button>
+          {/* Seul le responsable crée des interventions */}
+          {user?.role === 'RESPONSABLE' && (
+            <Button onClick={() => ouvrirFormulaire('nouvelle')} disabled={formulaire === 'nouvelle'}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Nouvelle intervention
+            </Button>
+          )}
         </header>
 
         <div className="interventions__barre">

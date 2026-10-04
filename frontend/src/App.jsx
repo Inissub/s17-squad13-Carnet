@@ -1,8 +1,9 @@
 import { Route, Routes } from 'react-router-dom'
 import { DashboardLayout } from './components/layout/DashboardLayout.jsx'
-import { ProtectedRoute } from './components/layout/ProtectedRoute.jsx'
+import { ProtectedRoute, ResponsableRoute } from './components/layout/ProtectedRoute.jsx'
 import { PublicLayout } from './components/layout/PublicLayout.jsx'
 import ActivationPage from './pages/auth/ActivationPage.jsx'
+import InvitationPage from './pages/auth/InvitationPage.jsx'
 import LoginPage from './pages/auth/LoginPage.jsx'
 import RegisterPage from './pages/auth/RegisterPage.jsx'
 import ClientDetailPage from './pages/clients/ClientDetailPage.jsx'
@@ -32,6 +33,7 @@ export default function App() {
 
       <Route path="/connexion" element={<LoginPage />} />
       <Route path="/activation" element={<ActivationPage />} />
+      <Route path="/invitation" element={<InvitationPage />} />
       <Route path="/inscription" element={<RegisterPage />} />
 
       <Route element={<ProtectedRoute />}>
@@ -39,10 +41,12 @@ export default function App() {
           <Route index element={<DashboardPage />} />
           <Route path="interventions" element={<InterventionsPage />} />
           <Route path="interventions/:id" element={<InterventionDetailPage />} />
-          <Route path="clients" element={<ClientsPage />} />
-          <Route path="clients/archives" element={<ArchivesPage />} />
-          <Route path="clients/:id" element={<ClientDetailPage />} />
-          <Route path="facturation" element={<FacturationPage />} />
+          <Route element={<ResponsableRoute />}>
+            <Route path="clients" element={<ClientsPage />} />
+            <Route path="clients/archives" element={<ArchivesPage />} />
+            <Route path="clients/:id" element={<ClientDetailPage />} />
+            <Route path="facturation" element={<FacturationPage />} />
+          </Route>
           <Route path="profil-public" element={<ProfilPublicPage />} />
           <Route path="profil-activite" element={<ProfilActivitePage />} />
         </Route>

@@ -6,7 +6,8 @@ import { z } from "zod";
 
 export const clientsRouter = Router();
 
-clientsRouter.use(requireRole("RESPONSABLE", "TECHNICIEN"));
+// Le carnet de clients est géré par le responsable ; un technicien voit le client depuis ses interventions
+clientsRouter.use(requireRole("RESPONSABLE"));
 
 const listeSchema = z.object({
   archive: z
