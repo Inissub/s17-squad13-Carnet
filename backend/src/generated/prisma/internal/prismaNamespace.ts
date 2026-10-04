@@ -1782,6 +1782,7 @@ export const PaiementScalarFieldEnum = {
   date: 'date',
   mode: 'mode',
   reference: 'reference',
+  numeroRecu: 'numeroRecu',
   createdAt: 'createdAt'
 } as const
 

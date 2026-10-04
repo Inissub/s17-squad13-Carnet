@@ -59,6 +59,7 @@ enum TypeReference {
   INTERVENTION
   DEVIS
   FACTURE
+  RECU
 }
 
 model Activite {
@@ -309,11 +310,14 @@ model Paiement {
   date       DateTime
   mode       ModePaiement
   reference  String?
+  // Numéro du reçu remis au client : REC-2026-0001, attribué à l'enregistrement du paiement
+  numeroRecu String
   createdAt  DateTime     @default(now())
 
   activite Activite @relation(fields: [activiteId], references: [id], onDelete: Cascade)
   facture  Facture  @relation(fields: [factureId], references: [id], onDelete: Restrict)
 
+  @@unique([activiteId, numeroRecu])
   @@index([factureId])
 }
 

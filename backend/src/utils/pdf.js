@@ -125,6 +125,112 @@ export function tableauLignes(doc, lignes, devise) {
   return total;
 }
 
+const LIBELLES_MODE = {
+  ESPECES: "Espèces",
+  MOBILE_MONEY: "Mobile Money",
+  VIREMENT: "Virement",
+  CHEQUE: "Chèque",
+  CARTE: "Carte",
+  AUTRE: "Autre",
+};
+const VERT = "#1f8a4c";
+
+// Paiements reçus sur une facture, puis récapitulatif : total, déjà payé, reste à payer
+export function blocPaiements(doc, paiements, total, devise) {
+  if (!paiements.length) return;
+  const l = largeur(doc);
+  verifierPlace(doc, 60 + paiements.length * 20);
+
+  doc.font("Helvetica-Bold").fontSize(10).fillColor(GRIS).text("PAIEMENTS REÇUS", MARGE, doc.y, { width: l });
+  doc.moveDown(0.4);
+
+  let paye = 0;
+  for (const p of paiements) {
+    paye += Number(p.montant);
+    const y = doc.y;
+    const mode = [LIBELLES_MODE[p.mode] ?? p.mode, p.reference].filter(Boolean).join(" · ");
+    doc.font("Helvetica").fontSize(9.5).fillColor(ENCRE);
+    doc.text(formatDate(p.date), MARGE, y, { width: l * 0.2 });
+    doc.text(propre(p.numeroRecu ?? ""), MARGE + l * 0.2, y, { width: l * 0.2 });
+    doc.text(propre(mode), MARGE + l * 0.4, y, { width: l * 0.35 });
+    doc.text(formatMontant(p.montant, devise), MARGE + l * 0.75, y, { width: l * 0.25, align: "right" });
+    doc.y = y + 16;
+  }
+  doc.moveTo(MARGE, doc.y).lineTo(MARGE + l, doc.y).strokeColor(TRAIT).stroke();
+  doc.moveDown(0.6);
+
+  const reste = Math.max(0, Math.round((total - paye) * 100) / 100);
+  const recap = (libelle, valeur, options = {}) => {
+    const y = doc.y;
+    doc.font(options.gras ? "Helvetica-Bold" : "Helvetica").fontSize(options.taille ?? 10).fillColor(options.couleur ?? ENCRE);
+    doc.text(libelle, MARGE + l * 0.45, y, { width: l * 0.3, align: "right" });
+    doc.text(valeur, MARGE + l * 0.75, y, { width: l * 0.25, align: "right" });
+    doc.y = y + (options.taille ?? 10) + 8;
+  };
+  recap("Total de la facture", formatMontant(total, devise));
+  recap("Déjà payé", `- ${formatMontant(paye, devise)}`, { couleur: VERT });
+  recap("Reste à payer", formatMontant(reste, devise), { gras: true, taille: 12, couleur: reste > 0 ? ACCENT : ENCRE });
+
+  if (reste <= 0) {
+    doc.moveDown(0.3);
+    doc.font("Helvetica-Bold").fontSize(11).fillColor(VERT).text("FACTURE ACQUITTÉE", MARGE, doc.y, { width: l, align: "right" });
+  }
+  doc.x = MARGE;
+  doc.moveDown(1.2);
+}
+
+// Corps d'un reçu : somme reçue (chiffres et lettres), objet du paiement, situation de la facture
+export function corpsRecu(doc, { client, montant, montantLettres, mode, reference, facture, situation, devise }) {
+  const l = largeur(doc);
+  const haut = doc.y;
+  const hauteur = 112;
+  doc.roundedRect(MARGE, haut, l, hauteur, 6).fillAndStroke("#fafafa", TRAIT);
+
+  doc.font("Helvetica").fontSize(10).fillColor(GRIS).text(`Reçu de ${propre(client)} la somme de`, MARGE + 20, haut + 16, { width: l - 40 });
+  doc.font("Helvetica-Bold").fontSize(24).fillColor(ENCRE).text(formatMontant(montant, devise), MARGE + 20, doc.y + 4, { width: l - 40 });
+  doc.font("Helvetica-Oblique").fontSize(10).fillColor(ENCRE).text(`soit : ${propre(montantLettres)}`, MARGE + 20, doc.y + 4, { width: l - 40 });
+  const mode_ = [LIBELLES_MODE[mode] ?? mode, reference && `réf. ${reference}`].filter(Boolean).join(" · ");
+  doc.font("Helvetica").fontSize(10).fillColor(GRIS).text(`Mode de paiement : ${propre(mode_)}`, MARGE + 20, doc.y + 6, { width: l - 40 });
+
+  doc.y = haut + hauteur + 18;
+  doc.x = MARGE;
+  doc.font("Helvetica").fontSize(10.5).fillColor(ENCRE).text(
+    `En règlement ${situation.reste > 0 ? "partiel " : ""}de la facture ${propre(facture.reference)} du ${formatDate(facture.dateEmission)}.`,
+    MARGE,
+    doc.y,
+    { width: l },
+  );
+  doc.moveDown(1.2);
+
+  const recap = (libelle, valeur, options = {}) => {
+    const y = doc.y;
+    doc.font(options.gras ? "Helvetica-Bold" : "Helvetica").fontSize(options.taille ?? 10).fillColor(options.couleur ?? ENCRE);
+    doc.text(libelle, MARGE + l * 0.4, y, { width: l * 0.35, align: "right" });
+    doc.text(valeur, MARGE + l * 0.75, y, { width: l * 0.25, align: "right" });
+    doc.y = y + (options.taille ?? 10) + 8;
+  };
+  recap("Montant de la facture", formatMontant(situation.total, devise));
+  recap("Total payé à ce jour", formatMontant(situation.paye, devise), { couleur: VERT });
+  recap("Reste à payer", formatMontant(situation.reste, devise), {
+    gras: true,
+    taille: 12,
+    couleur: situation.reste > 0 ? ACCENT : ENCRE,
+  });
+  if (situation.reste <= 0) {
+    doc.moveDown(0.3);
+    doc.font("Helvetica-Bold").fontSize(11).fillColor(VERT).text("FACTURE SOLDÉE", MARGE, doc.y, { width: l, align: "right" });
+  }
+
+  // Signature de l'entreprise
+  doc.moveDown(3);
+  verifierPlace(doc, 80);
+  const y = doc.y;
+  doc.font("Helvetica").fontSize(9).fillColor(GRIS).text("Signature et cachet", MARGE + l * 0.6, y, { width: l * 0.4 });
+  doc.moveTo(MARGE + l * 0.6, y + 60).lineTo(MARGE + l, y + 60).strokeColor(TRAIT).stroke();
+  doc.y = y + 70;
+  doc.x = MARGE;
+}
+
 // Section titrée avec un texte libre (ignorée si vide)
 export function section(doc, titre, texte) {
   if (!texte) return;

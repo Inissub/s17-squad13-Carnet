@@ -4,6 +4,7 @@ import { api } from '../../api/client.js'
 import { Badge } from '../../components/ui/Badge.jsx'
 import { Button } from '../../components/ui/Button.jsx'
 import { Card } from '../../components/ui/Card.jsx'
+import '../../components/ui/Filtres.css'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useFetch } from '../../hooks/useFetch.js'
 import { formatJourHeure } from '../../utils/format.js'
@@ -11,20 +12,18 @@ import { PRIORITES, STATUTS, getStatut } from '../../utils/interventions.js'
 import { FormulaireIntervention } from './FormulaireIntervention.jsx'
 import './InterventionsPage.css'
 
-
 const TAILLE_PAGE = 20
 
 // Requête de la liste : filtres et page sont appliqués par le serveur
-function cheminListe({ page, statut, q, jour }) {
+function cheminListe({ page, statut, q, du, au }) {
   const params = new URLSearchParams({ page, taille: TAILLE_PAGE })
   if (statut) params.set('statut', statut)
   if (q) params.set('q', q)
-  if (jour) {
-    // Bornes de la journée dans le fuseau du navigateur
-    const debut = new Date(`${jour}T00:00`)
-    const fin = new Date(debut)
+  // Bornes de la période dans le fuseau du navigateur ; « au » est inclus
+  if (du) params.set('du', new Date(`${du}T00:00`).toISOString())
+  if (au) {
+    const fin = new Date(`${au}T00:00`)
     fin.setDate(fin.getDate() + 1)
-    params.set('du', debut.toISOString())
     params.set('au', fin.toISOString())
   }
   return `/interventions?${params}`
@@ -110,14 +109,15 @@ export default function InterventionsPage() {
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const statutActif = searchParams.get('statut') ?? ''
-  const jourFiltre = searchParams.get('jour') ?? ''
+  const du = searchParams.get('du') ?? ''
+  const au = searchParams.get('au') ?? ''
   const q = searchParams.get('q') ?? ''
   const page = Math.max(1, Number(searchParams.get('page')) || 1)
   const [recherche, setRecherche] = useState(q)
   // null : fermé ; 'nouvelle' : création ; sinon id de l'intervention modifiée
   const [formulaire, setFormulaire] = useState(null)
 
-  const { data, loading, error, reload } = useFetch(cheminListe({ page, statut: statutActif, q, jour: jourFiltre }))
+  const { data, loading, error, reload } = useFetch(cheminListe({ page, statut: statutActif, q, du, au }))
   const visibles = data?.interventions ?? []
   const compteurs = data?.compteurs ?? {}
   const totalGlobal = Object.values(compteurs).reduce((somme, n) => somme + n, 0)
@@ -204,14 +204,12 @@ export default function InterventionsPage() {
           </div>
           <div className="interventions__outils">
             <div className="filtre-date">
-              <input
-                type="date"
-                value={jourFiltre}
-                onChange={(e) => majFiltres({ jour: e.target.value })}
-                aria-label="Filtrer par date prévue"
-              />
-              {jourFiltre && (
-                <button type="button" className="filtre-date__effacer" onClick={() => majFiltres({ jour: '' })} aria-label="Effacer le filtre de date">
+              <span className="filtre-date__libelle">Du</span>
+              <input type="date" value={du} max={au || undefined} onChange={(e) => majFiltres({ du: e.target.value })} aria-label="Prévues à partir du" />
+              <span className="filtre-date__libelle">au</span>
+              <input type="date" value={au} min={du || undefined} onChange={(e) => majFiltres({ au: e.target.value })} aria-label="Prévues jusqu'au" />
+              {(du || au) && (
+                <button type="button" className="filtre-date__effacer" onClick={() => majFiltres({ du: '', au: '' })} aria-label="Effacer la période">
                   ×
                 </button>
               )}
@@ -260,7 +258,7 @@ export default function InterventionsPage() {
           </div>
         ) : visibles.length === 0 ? (
           <p className="interventions__etat muted">
-            {q || statutActif || jourFiltre ? 'Aucune intervention ne correspond à ces critères.' : 'Aucune intervention pour le moment.'}
+            {q || statutActif || du || au ? 'Aucune intervention ne correspond à ces critères.' : 'Aucune intervention pour le moment.'}
           </p>
         ) : (
           <div className="interventions__scroll">

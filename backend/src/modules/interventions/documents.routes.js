@@ -5,6 +5,7 @@ import { requireRole } from "../../middleware/auth.js";
 import { HttpError, notFound } from "../../utils/httpError.js";
 import {
   blocClient,
+  blocPaiements,
   entete,
   formatDate,
   formatDateHeure,
@@ -172,7 +173,11 @@ documentsRouter.get("/factures/:factureId/pdf", async (req, res) => {
   const intervention = await chargerPourPdf(req);
   const facture = await prisma.facture.findFirst({
     where: { id: req.params.factureId, interventionId: intervention.id },
-    include: { lignes: { orderBy: { ordre: "asc" } }, devis: { select: { reference: true } } },
+    include: {
+      lignes: { orderBy: { ordre: "asc" } },
+      devis: { select: { reference: true } },
+      paiements: { orderBy: { date: "asc" } },
+    },
   });
   if (!facture) throw notFound("Facture");
 
@@ -183,7 +188,9 @@ documentsRouter.get("/factures/:factureId/pdf", async (req, res) => {
     dateDocument: `Émise le ${formatDate(facture.dateEmission)}`,
   });
   blocClient(doc, intervention);
-  tableauLignes(doc, facture.lignes, intervention.activite.devise);
+  const total = tableauLignes(doc, facture.lignes, intervention.activite.devise);
+  // Les acomptes et paiements déjà reçus apparaissent sur la facture
+  blocPaiements(doc, facture.paiements, total, intervention.activite.devise);
   if (facture.devis) section(doc, "Référence du devis", facture.devis.reference);
   if (facture.dateEcheance) section(doc, "Échéance", formatDate(facture.dateEcheance));
   doc.end();

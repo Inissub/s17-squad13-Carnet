@@ -1,5 +1,5 @@
-// Numérotation annuelle par activité : INT-2026-0001, DEV-2026-0001, FAC-2026-0001
-const PREFIXES = { INTERVENTION: "INT", DEVIS: "DEV", FACTURE: "FAC" };
+// Numérotation annuelle par activité : INT-2026-0001, DEV-2026-0001, FAC-2026-0001, REC-2026-0001
+const PREFIXES = { INTERVENTION: "INT", DEVIS: "DEV", FACTURE: "FAC", RECU: "REC" };
 
 export async function prochaineReference(tx, activiteId, type) {
   const annee = new Date().getFullYear();
