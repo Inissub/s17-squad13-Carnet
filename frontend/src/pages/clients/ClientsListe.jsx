@@ -3,12 +3,16 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Badge } from '../../components/ui/Badge.jsx'
 import { Card } from '../../components/ui/Card.jsx'
 import { useFetch } from '../../hooks/useFetch.js'
+import { useAuth } from '../../context/AuthContext.jsx'
 import './ClientsListe.css'
 
+
+
 export function ClientsListe({ titre, archive = false }) {
-    const navigate = useNavigate()
-    const [saisie, setSaisie] = useState('')
-    const [recherche, setRecherche] = useState('')
+    const navigate = useNavigate();
+    const [saisie, setSaisie] = useState('');
+    const [recherche, setRecherche] = useState('');
+    const { user } = useAuth();
 
 
     useEffect(() => {
@@ -47,9 +51,14 @@ export function ClientsListe({ titre, archive = false }) {
                 <h1 className="page-title">{titre}</h1>
                 <p className="muted">{sousTitre}</p>
             </div>
-            <Link to={archive ? '/dashboard/clients' : '/dashboard/clients/archives'}className="clients-switch">
-                {archive ? ' Tous les clients' : 'Voir les archivés'}
-            </Link>
+            <div className="clients-header__actions">
+                <Link to={archive ? '/dashboard/clients' : '/dashboard/clients/archives'} className="clients-switch">
+                    {archive ? ' Tous les clients' : 'Voir les archivés'}
+                </Link>
+                {!archive && user?.role === 'RESPONSABLE' && (
+                    <Link to="/dashboard/clients/nouveau" className="clients-nouveau">+ Nouveau client</Link>
+                )}
+            </div>
         </header>
 
         <Card title={titre} action={recherchePar}>

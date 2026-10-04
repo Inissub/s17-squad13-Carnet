@@ -89,3 +89,22 @@
     border-color: var(--accent);
     color: var(--accent);
 }
+
+.clients-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.clients-nouveau {
+    padding: var(--space-2) var(--space-4);
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.clients-nouveau:hover {
+    background: var(--accent-hover);
+}
