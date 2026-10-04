@@ -59,6 +59,7 @@ enum TypeReference {
   INTERVENTION
   DEVIS
   FACTURE
+  RECU
 }
 
 model Activite {
@@ -93,6 +94,11 @@ model Utilisateur {
   actif          Boolean  @default(true)
   createdAt      DateTime @default(now())
 
+  // Activation du compte par e-mail : null tant que le lien n'a pas été ouvert
+  emailVerifieLe        DateTime?
+  jetonActivationHash   String?   @unique
+  jetonActivationExpire DateTime?
+
   profilPublic Boolean @default(false)
   slug         String? @unique
   metier       String?
@@ -108,9 +114,25 @@ model Utilisateur {
   interventions Intervention[]     @relation("TechnicienIntervention")
   historiques   HistoriqueStatut[]
   avis          Avis[]
+  realisations  Realisation[]
 
   @@index([profilPublic, ville])
   @@index([activiteId])
+}
+
+// Réalisation présentée sur le profil public d'un technicien (photo dans le bucket public)
+model Realisation {
+  id            String   @id @default(uuid())
+  utilisateurId String
+  titre         String
+  description   String?
+  photoChemin   String
+  photoMime     String
+  createdAt     DateTime @default(now())
+
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+
+  @@index([utilisateurId])
 }
 
 model Compteur {
@@ -304,11 +326,14 @@ model Paiement {
   date       DateTime
   mode       ModePaiement
   reference  String?
+  // Numéro du reçu remis au client : REC-2026-0001, attribué à l'enregistrement du paiement
+  numeroRecu String
   createdAt  DateTime     @default(now())
 
   activite Activite @relation(fields: [activiteId], references: [id], onDelete: Cascade)
   facture  Facture  @relation(fields: [factureId], references: [id], onDelete: Restrict)
 
+  @@unique([activiteId, numeroRecu])
   @@index([factureId])
 }
 
@@ -320,6 +345,10 @@ model CompteClient {
   ville          String?
   motDePasseHash String
   createdAt      DateTime @default(now())
+
+  emailVerifieLe        DateTime?
+  jetonActivationHash   String?   @unique
+  jetonActivationExpire DateTime?
 
   clients Client[]
   avis    Avis[]

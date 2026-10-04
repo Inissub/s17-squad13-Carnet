@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Activite: 'Activite',
   Utilisateur: 'Utilisateur',
+  Realisation: 'Realisation',
   Compteur: 'Compteur',
   Client: 'Client',
   Intervention: 'Intervention',
@@ -109,6 +110,9 @@ export const UtilisateurScalarFieldEnum = {
   role: 'role',
   actif: 'actif',
   createdAt: 'createdAt',
+  emailVerifieLe: 'emailVerifieLe',
+  jetonActivationHash: 'jetonActivationHash',
+  jetonActivationExpire: 'jetonActivationExpire',
   profilPublic: 'profilPublic',
   slug: 'slug',
   metier: 'metier',
@@ -122,6 +126,19 @@ export const UtilisateurScalarFieldEnum = {
 } as const
 
 export type UtilisateurScalarFieldEnum = (typeof UtilisateurScalarFieldEnum)[keyof typeof UtilisateurScalarFieldEnum]
+
+
+export const RealisationScalarFieldEnum = {
+  id: 'id',
+  utilisateurId: 'utilisateurId',
+  titre: 'titre',
+  description: 'description',
+  photoChemin: 'photoChemin',
+  photoMime: 'photoMime',
+  createdAt: 'createdAt'
+} as const
+
+export type RealisationScalarFieldEnum = (typeof RealisationScalarFieldEnum)[keyof typeof RealisationScalarFieldEnum]
 
 
 export const CompteurScalarFieldEnum = {
@@ -283,6 +300,7 @@ export const PaiementScalarFieldEnum = {
   date: 'date',
   mode: 'mode',
   reference: 'reference',
+  numeroRecu: 'numeroRecu',
   createdAt: 'createdAt'
 } as const
 
@@ -296,7 +314,10 @@ export const CompteClientScalarFieldEnum = {
   telephone: 'telephone',
   ville: 'ville',
   motDePasseHash: 'motDePasseHash',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  emailVerifieLe: 'emailVerifieLe',
+  jetonActivationHash: 'jetonActivationHash',
+  jetonActivationExpire: 'jetonActivationExpire'
 } as const
 
 export type CompteClientScalarFieldEnum = (typeof CompteClientScalarFieldEnum)[keyof typeof CompteClientScalarFieldEnum]

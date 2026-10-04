@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requireAuth } from "./middleware/auth.js";
+import { requireAuth, requireRole } from "./middleware/auth.js";
 import { activiteRouter } from "./modules/activite/activite.routes.js";
 import { annuaireRouter } from "./modules/annuaire/annuaire.routes.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
@@ -17,10 +17,14 @@ routes.get("/health", (req, res) => res.json({ ok: true }));
 routes.use("/auth", authRouter);
 routes.use("/annuaire", annuaireRouter);
 
-routes.use("/espace-client", requireAuth, espaceClientRouter);
-routes.use("/dashboard", requireAuth, dashboardRouter);
-routes.use("/interventions", requireAuth, interventionsRouter);
-routes.use("/clients", requireAuth, clientsRouter);
-routes.use("/facturation", requireAuth, facturationRouter);
-routes.use("/profil-public", requireAuth, profilPublicRouter);
-routes.use("/activite", requireAuth, activiteRouter);
+// Les sessions client n'ont pas d'activiteId : elles ne doivent jamais atteindre les routes pro
+const client = [requireAuth, requireRole("CLIENT")];
+const pro = [requireAuth, requireRole("RESPONSABLE", "TECHNICIEN")];
+
+routes.use("/espace-client", client, espaceClientRouter);
+routes.use("/dashboard", pro, dashboardRouter);
+routes.use("/interventions", pro, interventionsRouter);
+routes.use("/clients", pro, clientsRouter);
+routes.use("/facturation", pro, facturationRouter);
+routes.use("/profil-public", pro, profilPublicRouter);
+routes.use("/activite", pro, activiteRouter);

@@ -42,6 +42,7 @@ export type PaiementMinAggregateOutputType = {
   date: Date | null
   mode: $Enums.ModePaiement | null
   reference: string | null
+  numeroRecu: string | null
   createdAt: Date | null
 }
 
@@ -53,6 +54,7 @@ export type PaiementMaxAggregateOutputType = {
   date: Date | null
   mode: $Enums.ModePaiement | null
   reference: string | null
+  numeroRecu: string | null
   createdAt: Date | null
 }
 
@@ -64,6 +66,7 @@ export type PaiementCountAggregateOutputType = {
   date: number
   mode: number
   reference: number
+  numeroRecu: number
   createdAt: number
   _all: number
 }
@@ -85,6 +88,7 @@ export type PaiementMinAggregateInputType = {
   date?: true
   mode?: true
   reference?: true
+  numeroRecu?: true
   createdAt?: true
 }
 
@@ -96,6 +100,7 @@ export type PaiementMaxAggregateInputType = {
   date?: true
   mode?: true
   reference?: true
+  numeroRecu?: true
   createdAt?: true
 }
 
@@ -107,6 +112,7 @@ export type PaiementCountAggregateInputType = {
   date?: true
   mode?: true
   reference?: true
+  numeroRecu?: true
   createdAt?: true
   _all?: true
 }
@@ -205,6 +211,7 @@ export type PaiementGroupByOutputType = {
   date: Date
   mode: $Enums.ModePaiement
   reference: string | null
+  numeroRecu: string
   createdAt: Date
   _count: PaiementCountAggregateOutputType | null
   _avg: PaiementAvgAggregateOutputType | null
@@ -239,6 +246,7 @@ export type PaiementWhereInput = {
   date?: Prisma.DateTimeFilter<"Paiement"> | Date | string
   mode?: Prisma.EnumModePaiementFilter<"Paiement"> | $Enums.ModePaiement
   reference?: Prisma.StringNullableFilter<"Paiement"> | string | null
+  numeroRecu?: Prisma.StringFilter<"Paiement"> | string
   createdAt?: Prisma.DateTimeFilter<"Paiement"> | Date | string
   activite?: Prisma.XOR<Prisma.ActiviteScalarRelationFilter, Prisma.ActiviteWhereInput>
   facture?: Prisma.XOR<Prisma.FactureScalarRelationFilter, Prisma.FactureWhereInput>
@@ -252,6 +260,7 @@ export type PaiementOrderByWithRelationInput = {
   date?: Prisma.SortOrder
   mode?: Prisma.SortOrder
   reference?: Prisma.SortOrderInput | Prisma.SortOrder
+  numeroRecu?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   activite?: Prisma.ActiviteOrderByWithRelationInput
   facture?: Prisma.FactureOrderByWithRelationInput
@@ -259,6 +268,7 @@ export type PaiementOrderByWithRelationInput = {
 
 export type PaiementWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  activiteId_numeroRecu?: Prisma.PaiementActiviteIdNumeroRecuCompoundUniqueInput
   AND?: Prisma.PaiementWhereInput | Prisma.PaiementWhereInput[]
   OR?: Prisma.PaiementWhereInput[]
   NOT?: Prisma.PaiementWhereInput | Prisma.PaiementWhereInput[]
@@ -268,10 +278,11 @@ export type PaiementWhereUniqueInput = Prisma.AtLeast<{
   date?: Prisma.DateTimeFilter<"Paiement"> | Date | string
   mode?: Prisma.EnumModePaiementFilter<"Paiement"> | $Enums.ModePaiement
   reference?: Prisma.StringNullableFilter<"Paiement"> | string | null
+  numeroRecu?: Prisma.StringFilter<"Paiement"> | string
   createdAt?: Prisma.DateTimeFilter<"Paiement"> | Date | string
   activite?: Prisma.XOR<Prisma.ActiviteScalarRelationFilter, Prisma.ActiviteWhereInput>
   facture?: Prisma.XOR<Prisma.FactureScalarRelationFilter, Prisma.FactureWhereInput>
-}, "id">
+}, "id" | "activiteId_numeroRecu">
 
 export type PaiementOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -281,6 +292,7 @@ export type PaiementOrderByWithAggregationInput = {
   date?: Prisma.SortOrder
   mode?: Prisma.SortOrder
   reference?: Prisma.SortOrderInput | Prisma.SortOrder
+  numeroRecu?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.PaiementCountOrderByAggregateInput
   _avg?: Prisma.PaiementAvgOrderByAggregateInput
@@ -300,6 +312,7 @@ export type PaiementScalarWhereWithAggregatesInput = {
   date?: Prisma.DateTimeWithAggregatesFilter<"Paiement"> | Date | string
   mode?: Prisma.EnumModePaiementWithAggregatesFilter<"Paiement"> | $Enums.ModePaiement
   reference?: Prisma.StringNullableWithAggregatesFilter<"Paiement"> | string | null
+  numeroRecu?: Prisma.StringWithAggregatesFilter<"Paiement"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Paiement"> | Date | string
 }
 
@@ -309,6 +322,7 @@ export type PaiementCreateInput = {
   date: Date | string
   mode: $Enums.ModePaiement
   reference?: string | null
+  numeroRecu: string
   createdAt?: Date | string
   activite: Prisma.ActiviteCreateNestedOneWithoutPaiementsInput
   facture: Prisma.FactureCreateNestedOneWithoutPaiementsInput
@@ -322,6 +336,7 @@ export type PaiementUncheckedCreateInput = {
   date: Date | string
   mode: $Enums.ModePaiement
   reference?: string | null
+  numeroRecu: string
   createdAt?: Date | string
 }
 
@@ -331,6 +346,7 @@ export type PaiementUpdateInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode?: Prisma.EnumModePaiementFieldUpdateOperationsInput | $Enums.ModePaiement
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numeroRecu?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   activite?: Prisma.ActiviteUpdateOneRequiredWithoutPaiementsNestedInput
   facture?: Prisma.FactureUpdateOneRequiredWithoutPaiementsNestedInput
@@ -344,6 +360,7 @@ export type PaiementUncheckedUpdateInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode?: Prisma.EnumModePaiementFieldUpdateOperationsInput | $Enums.ModePaiement
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numeroRecu?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -355,6 +372,7 @@ export type PaiementCreateManyInput = {
   date: Date | string
   mode: $Enums.ModePaiement
   reference?: string | null
+  numeroRecu: string
   createdAt?: Date | string
 }
 
@@ -364,6 +382,7 @@ export type PaiementUpdateManyMutationInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode?: Prisma.EnumModePaiementFieldUpdateOperationsInput | $Enums.ModePaiement
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numeroRecu?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -375,6 +394,7 @@ export type PaiementUncheckedUpdateManyInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode?: Prisma.EnumModePaiementFieldUpdateOperationsInput | $Enums.ModePaiement
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numeroRecu?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -388,6 +408,11 @@ export type PaiementOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type PaiementActiviteIdNumeroRecuCompoundUniqueInput = {
+  activiteId: string
+  numeroRecu: string
+}
+
 export type PaiementCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   activiteId?: Prisma.SortOrder
@@ -396,6 +421,7 @@ export type PaiementCountOrderByAggregateInput = {
   date?: Prisma.SortOrder
   mode?: Prisma.SortOrder
   reference?: Prisma.SortOrder
+  numeroRecu?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -411,6 +437,7 @@ export type PaiementMaxOrderByAggregateInput = {
   date?: Prisma.SortOrder
   mode?: Prisma.SortOrder
   reference?: Prisma.SortOrder
+  numeroRecu?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -422,6 +449,7 @@ export type PaiementMinOrderByAggregateInput = {
   date?: Prisma.SortOrder
   mode?: Prisma.SortOrder
   reference?: Prisma.SortOrder
+  numeroRecu?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -523,6 +551,7 @@ export type PaiementCreateWithoutActiviteInput = {
   date: Date | string
   mode: $Enums.ModePaiement
   reference?: string | null
+  numeroRecu: string
   createdAt?: Date | string
   facture: Prisma.FactureCreateNestedOneWithoutPaiementsInput
 }
@@ -534,6 +563,7 @@ export type PaiementUncheckedCreateWithoutActiviteInput = {
   date: Date | string
   mode: $Enums.ModePaiement
   reference?: string | null
+  numeroRecu: string
   createdAt?: Date | string
 }
 
@@ -574,6 +604,7 @@ export type PaiementScalarWhereInput = {
   date?: Prisma.DateTimeFilter<"Paiement"> | Date | string
   mode?: Prisma.EnumModePaiementFilter<"Paiement"> | $Enums.ModePaiement
   reference?: Prisma.StringNullableFilter<"Paiement"> | string | null
+  numeroRecu?: Prisma.StringFilter<"Paiement"> | string
   createdAt?: Prisma.DateTimeFilter<"Paiement"> | Date | string
 }
 
@@ -583,6 +614,7 @@ export type PaiementCreateWithoutFactureInput = {
   date: Date | string
   mode: $Enums.ModePaiement
   reference?: string | null
+  numeroRecu: string
   createdAt?: Date | string
   activite: Prisma.ActiviteCreateNestedOneWithoutPaiementsInput
 }
@@ -594,6 +626,7 @@ export type PaiementUncheckedCreateWithoutFactureInput = {
   date: Date | string
   mode: $Enums.ModePaiement
   reference?: string | null
+  numeroRecu: string
   createdAt?: Date | string
 }
 
@@ -630,6 +663,7 @@ export type PaiementCreateManyActiviteInput = {
   date: Date | string
   mode: $Enums.ModePaiement
   reference?: string | null
+  numeroRecu: string
   createdAt?: Date | string
 }
 
@@ -639,6 +673,7 @@ export type PaiementUpdateWithoutActiviteInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode?: Prisma.EnumModePaiementFieldUpdateOperationsInput | $Enums.ModePaiement
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numeroRecu?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   facture?: Prisma.FactureUpdateOneRequiredWithoutPaiementsNestedInput
 }
@@ -650,6 +685,7 @@ export type PaiementUncheckedUpdateWithoutActiviteInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode?: Prisma.EnumModePaiementFieldUpdateOperationsInput | $Enums.ModePaiement
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numeroRecu?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -660,6 +696,7 @@ export type PaiementUncheckedUpdateManyWithoutActiviteInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode?: Prisma.EnumModePaiementFieldUpdateOperationsInput | $Enums.ModePaiement
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numeroRecu?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -670,6 +707,7 @@ export type PaiementCreateManyFactureInput = {
   date: Date | string
   mode: $Enums.ModePaiement
   reference?: string | null
+  numeroRecu: string
   createdAt?: Date | string
 }
 
@@ -679,6 +717,7 @@ export type PaiementUpdateWithoutFactureInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode?: Prisma.EnumModePaiementFieldUpdateOperationsInput | $Enums.ModePaiement
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numeroRecu?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   activite?: Prisma.ActiviteUpdateOneRequiredWithoutPaiementsNestedInput
 }
@@ -690,6 +729,7 @@ export type PaiementUncheckedUpdateWithoutFactureInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode?: Prisma.EnumModePaiementFieldUpdateOperationsInput | $Enums.ModePaiement
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numeroRecu?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -700,6 +740,7 @@ export type PaiementUncheckedUpdateManyWithoutFactureInput = {
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mode?: Prisma.EnumModePaiementFieldUpdateOperationsInput | $Enums.ModePaiement
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  numeroRecu?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -713,6 +754,7 @@ export type PaiementSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   date?: boolean
   mode?: boolean
   reference?: boolean
+  numeroRecu?: boolean
   createdAt?: boolean
   activite?: boolean | Prisma.ActiviteDefaultArgs<ExtArgs>
   facture?: boolean | Prisma.FactureDefaultArgs<ExtArgs>
@@ -726,6 +768,7 @@ export type PaiementSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   date?: boolean
   mode?: boolean
   reference?: boolean
+  numeroRecu?: boolean
   createdAt?: boolean
   activite?: boolean | Prisma.ActiviteDefaultArgs<ExtArgs>
   facture?: boolean | Prisma.FactureDefaultArgs<ExtArgs>
@@ -739,6 +782,7 @@ export type PaiementSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   date?: boolean
   mode?: boolean
   reference?: boolean
+  numeroRecu?: boolean
   createdAt?: boolean
   activite?: boolean | Prisma.ActiviteDefaultArgs<ExtArgs>
   facture?: boolean | Prisma.FactureDefaultArgs<ExtArgs>
@@ -752,10 +796,11 @@ export type PaiementSelectScalar = {
   date?: boolean
   mode?: boolean
   reference?: boolean
+  numeroRecu?: boolean
   createdAt?: boolean
 }
 
-export type PaiementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "activiteId" | "factureId" | "montant" | "date" | "mode" | "reference" | "createdAt", ExtArgs["result"]["paiement"]>
+export type PaiementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "activiteId" | "factureId" | "montant" | "date" | "mode" | "reference" | "numeroRecu" | "createdAt", ExtArgs["result"]["paiement"]>
 export type PaiementInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   activite?: boolean | Prisma.ActiviteDefaultArgs<ExtArgs>
   facture?: boolean | Prisma.FactureDefaultArgs<ExtArgs>
@@ -783,6 +828,7 @@ export type $PaiementPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     date: Date
     mode: $Enums.ModePaiement
     reference: string | null
+    numeroRecu: string
     createdAt: Date
   }, ExtArgs["result"]["paiement"]>
   composites: {}
@@ -1216,6 +1262,7 @@ export interface PaiementFieldRefs {
   readonly date: Prisma.FieldRef<"Paiement", 'DateTime'>
   readonly mode: Prisma.FieldRef<"Paiement", 'ModePaiement'>
   readonly reference: Prisma.FieldRef<"Paiement", 'String'>
+  readonly numeroRecu: Prisma.FieldRef<"Paiement", 'String'>
   readonly createdAt: Prisma.FieldRef<"Paiement", 'DateTime'>
 }
     

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
 
-export const SESSION_COOKIE = "carnet_session";
+const SESSION_COOKIE = "carnet_session";
 const DUREE_MS = 7 * 24 * 60 * 60 * 1000;
 
 export function ouvrirSession(res, payload) {

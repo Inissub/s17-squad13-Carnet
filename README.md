@@ -57,6 +57,6 @@ npm run dev
 
 ## Contribuer
 
-- Une branche par tâche : `feature/<page>-<tache>`
-- PR vers `main` avec au moins une relecture
+- Une branche par tâche à créer en partant de la branche `develop` : `feature/<page>-<tache>`
+- PR vers la branche `develop` avec au moins une relecture
 - `npm run lint` dans `frontend/` avant chaque PR

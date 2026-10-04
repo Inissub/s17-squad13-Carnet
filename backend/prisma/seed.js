@@ -46,6 +46,7 @@ async function main() {
       nom: "Jean-Claude Mabiala",
       email: EMAIL_RESPONSABLE,
       motDePasseHash: hash,
+      emailVerifieLe: new Date(),
       role: "RESPONSABLE",
       telephone: "+242 06 612 34 56",
     },
@@ -57,6 +58,7 @@ async function main() {
       nom: "Grâce Nkounkou",
       email: "grace@carnet.test",
       motDePasseHash: hash,
+      emailVerifieLe: new Date(),
       role: "TECHNICIEN",
       profilPublic: true,
       slug: "grace-nkounkou",
@@ -75,6 +77,7 @@ async function main() {
       nom: "Arnaud Moukala",
       email: "arnaud@carnet.test",
       motDePasseHash: hash,
+      emailVerifieLe: new Date(),
       role: "TECHNICIEN",
       profilPublic: true,
       slug: "arnaud-moukala",
@@ -88,10 +91,10 @@ async function main() {
   });
 
   const mireille = await prisma.compteClient.create({
-    data: { nom: "Mireille Ngoma", email: EMAILS_CLIENTS[0], telephone: "+242 06 401 22 18", ville: "Brazzaville", motDePasseHash: hash },
+    data: { nom: "Mireille Ngoma", email: EMAILS_CLIENTS[0], telephone: "+242 06 401 22 18", ville: "Brazzaville", motDePasseHash: hash, emailVerifieLe: new Date() },
   });
   const christian = await prisma.compteClient.create({
-    data: { nom: "Christian Loubaki", email: EMAILS_CLIENTS[1], telephone: "+242 06 955 43 21", ville: "Brazzaville", motDePasseHash: hash },
+    data: { nom: "Christian Loubaki", email: EMAILS_CLIENTS[1], telephone: "+242 06 955 43 21", ville: "Brazzaville", motDePasseHash: hash, emailVerifieLe: new Date() },
   });
 
   const fichesClients = [
@@ -218,6 +221,7 @@ async function main() {
     [1, lignesPrises, jour(-4, 12), [[30000, jour(-4, 12), "ESPECES", null]]],
     [2, lignesHall, jour(-12, 14), []],
   ];
+  let recus = 0;
   for (const [i, [d, lignes, dateEmission, paiements]] of facturesDonnees.entries()) {
     const echeance = new Date(dateEmission);
     echeance.setDate(echeance.getDate() + 7);
@@ -231,7 +235,14 @@ async function main() {
         dateEcheance: echeance,
         lignes: { create: versLignes(lignes) },
         paiements: {
-          create: paiements.map(([montant, date, mode, ref]) => ({ activiteId: activite.id, montant, date, mode, reference: ref })),
+          create: paiements.map(([montant, date, mode, ref]) => ({
+            activiteId: activite.id,
+            montant,
+            date,
+            mode,
+            reference: ref,
+            numeroRecu: reference("REC", ++recus),
+          })),
         },
       },
     });
@@ -261,6 +272,7 @@ async function main() {
       { activiteId: activite.id, type: "INTERVENTION", annee: ANNEE, valeur: donnees.length },
       { activiteId: activite.id, type: "DEVIS", annee: ANNEE, valeur: devisDonnees.length },
       { activiteId: activite.id, type: "FACTURE", annee: ANNEE, valeur: facturesDonnees.length },
+      { activiteId: activite.id, type: "RECU", annee: ANNEE, valeur: recus },
     ],
   });
 
