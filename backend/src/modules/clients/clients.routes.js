@@ -61,4 +61,5 @@ clientsRouter.get("/:id", async (req, res)=>{
     if(!client){
         throw new HttpError(404, "Client introuvable")
     }
+    res.json(client);
 })
