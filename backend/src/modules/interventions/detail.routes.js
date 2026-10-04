@@ -79,7 +79,7 @@ detailRouter.get("/", async (req, res) => {
         orderBy: { createdAt: "desc" },
       },
       piecesJointes: {
-        select: { id: true, categorie: true, chemin: true, nomOriginal: true, typeMime: true, taille: true, createdAt: true },
+        select: { id: true, categorie: true, nomOriginal: true, typeMime: true, taille: true, createdAt: true },
         orderBy: { createdAt: "asc" },
       },
       devis: {
@@ -98,7 +98,7 @@ detailRouter.get("/", async (req, res) => {
   res.json({
     ...reste,
     // Le fichier passe par l'API, qui vérifie l'accès avant de le servir
-    piecesJointes: piecesJointes.map(({ chemin, ...piece }) => ({
+    piecesJointes: piecesJointes.map((piece) => ({
       ...piece,
       url: `/api/interventions/${intervention.id}/pieces/${piece.id}/fichier`,
     })),
