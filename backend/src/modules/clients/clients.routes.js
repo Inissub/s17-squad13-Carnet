@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../../db/prisma.js";
 import { requireRole } from "../../middleware/auth.js";
+import { HttpError } from "../../utils/httpError.js";
 import { z } from "zod";
 
 export const clientsRouter = Router();
@@ -11,6 +12,7 @@ const listeSchema = z.object({
     archive: z.enum(["true", "false"]).optional().transform((v) => v === "true"),
     q: z.string().trim().optional()
 })
+
 
 clientsRouter.get("/", async (req, res)=>{
 
@@ -40,3 +42,23 @@ clientsRouter.get("/", async (req, res)=>{
     res.json(clients);
 });
 
+clientsRouter.get("/:id", async (req, res)=>{
+    const client = await prisma.client.findFirst({
+        where: { id: req.params.id, activiteId: req.user.activiteId},
+        select: {
+            id: true,
+            nom: true,
+            telephone: true,
+            adresse: true,
+            notes: true,
+            archive: true,
+            createdAt: true,
+            updatedAt: true,
+            compteClient: { select: { nom: true, email: true, telephone: true, ville: true } },
+            _count: { select: { interventions: true } },
+        },
+    });
+    if(!client){
+        throw new HttpError(404, "Client introuvable")
+    }
+})
