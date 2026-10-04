@@ -158,7 +158,7 @@ clientsRouter.put("/:id", async (req, res) => {
 });
 
 // Archiver plutôt que supprimer : les interventions et factures du client restent consultables
-clientsRouter.patch("/:id/archive", requireRole("RESPONSABLE"), async (req, res) => {
+clientsRouter.patch("/:id/archive", async (req, res) => {
   const { archive } = archiveSchema.parse(req.body);
   const client = await trouverClient(req);
   refuserSiCarnet(client);

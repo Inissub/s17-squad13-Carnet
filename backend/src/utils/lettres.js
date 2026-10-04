@@ -31,7 +31,7 @@ function troisChiffres(n, final) {
   return texte;
 }
 
-export function nombreEnLettres(nombre) {
+function nombreEnLettres(nombre) {
   let n = Math.floor(Math.abs(nombre));
   if (n === 0) return UNITES[0];
   const groupes = [
