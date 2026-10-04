@@ -1,0 +1,51 @@
+.annuaire-recherche {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-5) 0;
+}
+
+.annuaire-champ {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}
+
+.annuaire-champ--texte {
+  flex: 1;
+  min-width: 220px;
+}
+
+.annuaire-liste {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.annuaire-carte__nom {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.annuaire-carte__info {
+  color: var(--muted);
+  margin-top: var(--space-1);
+}
+
+.annuaire-carte__etoiles {
+  color: var(--warn);
+  margin-top: var(--space-3);
+}
+
+.annuaire-vide {
+  color: var(--muted);
+}
+.annuaire-lien {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
