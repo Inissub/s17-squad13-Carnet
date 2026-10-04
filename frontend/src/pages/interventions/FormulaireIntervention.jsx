@@ -31,7 +31,7 @@ function versDateLocale(iso) {
 
 function versFormulaire(intervention) {
   return {
-    client: `client:${intervention.client.id}`,
+    client: intervention.client.id,
     objet: intervention.objet,
     priorite: intervention.priorite,
     statut: intervention.statut,
@@ -43,12 +43,9 @@ function versFormulaire(intervention) {
   }
 }
 
-// La valeur du select client encode sa table d'origine : « client:<id> » ou « compte:<id> »
 function versPayload(form) {
-  const [source, id] = form.client.split(':')
   return {
-    clientId: source === 'client' ? id : undefined,
-    compteClientId: source === 'compte' ? id : undefined,
+    clientId: form.client,
     objet: form.objet,
     priorite: form.priorite,
     statut: form.statut,
@@ -95,18 +92,20 @@ function Edition({ id, onEnregistree, onAnnuler }) {
 
 function Formulaire({ intervention, initial, onEnregistree, onAnnuler }) {
   const { user } = useAuth()
-  const clients = useFetch('/clients')
+  const clients = useFetch('/interventions/clients')
   const techniciens = useFetch('/activite/techniciens')
   const [form, setForm] = useState(initial)
   const [erreur, setErreur] = useState(null)
   const [envoi, setEnvoi] = useState(false)
 
   const edition = Boolean(intervention)
-  const fiches = (clients.data ?? []).filter((c) => c.source === 'client')
-  const comptes = (clients.data ?? []).filter((c) => c.source === 'compte')
-  const clientChoisi = (clients.data ?? []).find((c) => `${c.source}:${c.id}` === form.client)
+  // Clients de l'onglet Clients, regroupés par statut
+  const externes = (clients.data ?? []).filter((c) => !c.compteClientId)
+  const carnet = (clients.data ?? []).filter((c) => c.compteClientId)
+  const clientChoisi = (clients.data ?? []).find((c) => c.id === form.client)
   // Le client actuel peut avoir été archivé : il reste sélectionnable pour cette intervention
-  const clientArchive = edition && !fiches.some((c) => c.id === intervention.client.id) ? intervention.client : null
+  const clientArchive =
+    edition && !(clients.data ?? []).some((c) => c.id === intervention.client.id) ? intervention.client : null
 
   const changer = (champ) => (e) => setForm((f) => ({ ...f, [champ]: e.target.value }))
 
@@ -141,22 +140,20 @@ function Formulaire({ intervention, initial, onEnregistree, onAnnuler }) {
       <form onSubmit={soumettre} className="nouvelle-intervention__grille">
         <Select label="Client" value={form.client} onChange={changer('client')} required>
           <option value="">{clients.loading ? 'Chargement…' : 'Choisir…'}</option>
-          {(fiches.length > 0 || clientArchive) && (
-            <optgroup label="Mes clients">
-              {clientArchive && !clients.loading && (
-                <option value={`client:${clientArchive.id}`}>{clientArchive.nom} (archivé)</option>
-              )}
-              {fiches.map((c) => (
-                <option key={c.id} value={`client:${c.id}`}>
+          {clientArchive && !clients.loading && <option value={clientArchive.id}>{clientArchive.nom} (archivé)</option>}
+          {externes.length > 0 && (
+            <optgroup label="Externes">
+              {externes.map((c) => (
+                <option key={c.id} value={c.id}>
                   {c.nom}
                 </option>
               ))}
             </optgroup>
           )}
-          {comptes.length > 0 && (
-            <optgroup label="Comptes clients inscrits">
-              {comptes.map((c) => (
-                <option key={c.id} value={`compte:${c.id}`}>
+          {carnet.length > 0 && (
+            <optgroup label="Enregistrés sur Carnet">
+              {carnet.map((c) => (
+                <option key={c.id} value={c.id}>
                   {c.nom}
                 </option>
               ))}

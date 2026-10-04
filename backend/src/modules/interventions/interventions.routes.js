@@ -11,10 +11,9 @@ export const interventionsRouter = Router();
 
 const optionnel = z.preprocess((v) => (v === "" ? undefined : v), z.string().trim().optional());
 
-// Le client vient soit d'une fiche de l'activité, soit d'un compte client inscrit
+// Le client est l'une des fiches de l'activité (onglet Clients)
 const champs = z.object({
-  clientId: optionnel,
-  compteClientId: optionnel,
+  clientId: z.string({ error: "Client requis" }).min(1, "Client requis"),
   objet: z.string().trim().min(3, "Objet trop court"),
   priorite: z.enum(["BASSE", "NORMALE", "HAUTE", "URGENTE"]).default("NORMALE"),
   datePrevue: z.preprocess((v) => (v === "" || v == null ? undefined : v), z.coerce.date().optional()),
@@ -27,16 +26,11 @@ const champs = z.object({
   description: optionnel,
 });
 
-const unSeulClient = [
-  (d) => Boolean(d.clientId) !== Boolean(d.compteClientId),
-  { message: "Client requis", path: ["clientId"] },
-];
-
 const statut = z.enum(["A_PLANIFIER", "PLANIFIEE", "EN_COURS", "TERMINEE", "ANNULEE"]);
 
 // À la création, le statut est déduit de la date s'il n'est pas fourni
-const creationSchema = champs.extend({ statut: statut.optional() }).refine(...unSeulClient);
-const modificationSchema = champs.extend({ statut }).refine(...unSeulClient);
+const creationSchema = champs.extend({ statut: statut.optional() });
+const modificationSchema = champs.extend({ statut });
 
 const listeSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -60,24 +54,14 @@ const selectListe = {
   technicien: { select: { id: true, nom: true } },
 };
 
-// Fiche client de l'activité à utiliser ; un compte inscrit reçoit sa fiche au premier travail
+// Fiche client de l'activité (ajoutée depuis l'onglet Clients)
 async function resoudreClient(tx, activiteId, data, clientActuelId) {
-  if (data.clientId) {
-    const client = await tx.client.findFirst({
-      // Une fiche archivée reste acceptée si l'intervention y est déjà rattachée
-      where: { id: data.clientId, activiteId, ...(data.clientId !== clientActuelId && { archive: false }) },
-    });
-    if (!client) throw new HttpError(400, "Client introuvable");
-    return client;
-  }
-  const compte = await tx.compteClient.findFirst({ where: { id: data.compteClientId, emailVerifieLe: { not: null } } });
-  if (!compte) throw new HttpError(400, "Compte client introuvable");
-  return (
-    (await tx.client.findFirst({ where: { activiteId, compteClientId: compte.id } })) ??
-    (await tx.client.create({
-      data: { activiteId, nom: compte.nom, telephone: compte.telephone, compteClientId: compte.id },
-    }))
-  );
+  const client = await tx.client.findFirst({
+    // Une fiche archivée reste acceptée si l'intervention y est déjà rattachée
+    where: { id: data.clientId, activiteId, ...(data.clientId !== clientActuelId && { archive: false }) },
+  });
+  if (!client) throw new HttpError(400, "Client introuvable");
+  return client;
 }
 
 async function verifierTechnicien(tx, activiteId, technicienId) {
@@ -85,6 +69,18 @@ async function verifierTechnicien(tx, activiteId, technicienId) {
   const technicien = await tx.utilisateur.findFirst({ where: { id: technicienId, activiteId, actif: true } });
   if (!technicien) throw new HttpError(400, "Technicien introuvable");
 }
+
+// Clients proposés dans le formulaire d'intervention : uniquement ceux ajoutés dans l'onglet Clients
+// (externes et enregistrés sur Carnet), hors archives.
+// Déclarée avant les routes « /:id » pour que « clients » ne soit pas pris pour un identifiant.
+interventionsRouter.get("/clients", async (req, res) => {
+  const clients = await prisma.client.findMany({
+    where: { activiteId: req.user.activiteId, archive: false },
+    select: { id: true, nom: true, telephone: true, adresse: true, compteClientId: true },
+    orderBy: { nom: "asc" },
+  });
+  res.json(clients);
+});
 
 interventionsRouter.get("/", async (req, res) => {
   const { page, taille, statut, q, du, au } = listeSchema.parse(req.query);
