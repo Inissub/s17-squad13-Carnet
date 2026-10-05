@@ -11,7 +11,6 @@
   gap: var(--space-2);
 }
 
-/* En-tête : retour, référence, titre, statut et actions */
 .detail__entete {
   display: flex;
   align-items: flex-start;
@@ -48,7 +47,6 @@
   gap: var(--space-2);
 }
 
-/* Pastille devant le libellé, comme dans la liste */
 .detail__badges .badge::before {
   content: '';
   width: 6px;
@@ -71,7 +69,6 @@
   text-align: right;
 }
 
-/* Corps : colonne principale et colonne latérale */
 .detail__corps {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
@@ -169,7 +166,6 @@
   font-size: 13px;
 }
 
-/* Photos et documents */
 .pieces {
   padding: var(--space-3) 0;
   border-top: 1px solid var(--line);
@@ -235,7 +231,6 @@
   color: var(--err);
 }
 
-/* Validation des travaux */
 .validation {
   display: flex;
   flex-direction: column;
@@ -265,7 +260,6 @@
   font-size: 12px;
 }
 
-/* Devis et factures */
 .chiffrage__liste {
   display: flex;
   flex-direction: column;
@@ -330,9 +324,7 @@
   font-size: 12px;
 }
 
-/* Lignes d'un devis ou d'une facture.
-   La disposition dépend de la largeur du formulaire lui-même (container query), pas de l'écran :
-   le formulaire vit dans une colonne bien plus étroite que la fenêtre. */
+/* Lignes de devis et de facture : disposition selon la largeur du formulaire, pas de l'écran */
 .lignes {
   container-type: inline-size;
   display: flex;
@@ -340,7 +332,7 @@
   gap: var(--space-3);
 }
 
-/* Large : une ligne = une rangée, sous un en-tête de colonnes */
+/* Large : une rangée par ligne */
 .lignes__grille {
   display: grid;
   grid-template-columns: minmax(160px, 1fr) 150px 90px 150px 120px 32px;
@@ -368,7 +360,7 @@
   min-width: 0;
 }
 
-/* Étiquette de chaque champ : lue par les lecteurs d'écran, visible seulement en disposition étroite */
+/* Visible seulement en disposition étroite, toujours lue par les lecteurs d'écran */
 .lignes__etiquette {
   position: absolute;
   width: 1px;
@@ -378,7 +370,6 @@
   white-space: nowrap;
 }
 
-/* Champs numériques : sans flèches, pour laisser toute la place au montant */
 .lignes__nombre {
   text-align: right;
   appearance: textfield;
@@ -419,7 +410,7 @@
   cursor: default;
 }
 
-/* Étroit : la ligne passe sur deux rangées, chaque champ avec son étiquette */
+/* Étroit : deux rangées */
 @container (max-width: 760px) {
   .lignes__titres {
     display: none;
@@ -460,7 +451,7 @@
   }
 }
 
-/* Très étroit (téléphone) : type et quantité, puis prix et total */
+/* Téléphone : trois rangées */
 @container (max-width: 440px) {
   .lignes__ligne {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 32px;

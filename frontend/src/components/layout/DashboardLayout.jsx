@@ -47,7 +47,7 @@ function Icone({ nom }) {
   )
 }
 
-// Onglets principaux ; un technicien ne voit que son travail : ni le carnet de clients, ni la facturation
+// Un technicien ne voit ni les clients ni la facturation
 const MENU = [
   { to: '/dashboard', label: 'Aujourd’hui', icone: 'accueil', end: true },
   { to: '/dashboard/interventions', label: 'Interventions', icone: 'interventions' },
@@ -55,7 +55,6 @@ const MENU = [
   { to: '/dashboard/facturation', label: 'Facturation', icone: 'facturation', responsable: true },
 ]
 
-// Onglets du compte, placés en bas de la barre latérale
 const MENU_BAS = [
   { to: '/dashboard/profil-public', label: 'Mon profil public', icone: 'profilPublic' },
   { to: '/dashboard/profil-activite', label: 'Profil de l’activité', technicien: 'Mon compte', icone: 'activite' },
@@ -71,7 +70,7 @@ const initiales = (nom = '') =>
     .map((mot) => mot[0].toUpperCase())
     .join('')
 
-// Largeur sous laquelle la barre latérale devient un tiroir (même valeur que dans DashboardLayout.css)
+// Même valeur que dans DashboardLayout.css
 const LARGEUR_MOBILE = 900
 
 const classeLien = ({ isActive }) => `dashboard-nav__lien ${isActive ? 'dashboard-nav__lien--actif' : ''}`
@@ -116,7 +115,6 @@ export function DashboardLayout() {
       </header>
 
       <div className="dashboard-cadre">
-        {/* Petit écran : voile derrière le tiroir ; un clic à côté le referme */}
         {menu.ouvert && <div className="dashboard-voile" onClick={menu.fermer} aria-hidden="true" />}
         <aside id={idMenu} className={`dashboard-sidebar ${menu.ouvert ? 'dashboard-sidebar--ouverte' : ''}`} onClick={menu.fermerSurLien}>
           {user?.activite?.nom && <p className="dashboard-sidebar__activite">{user.activite.nom}</p>}

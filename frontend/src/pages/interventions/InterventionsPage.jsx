@@ -15,7 +15,6 @@ import '../../components/ui/TableCartes.css'
 
 const TAILLE_PAGE = 20
 
-// Requête de la liste : filtres et page sont appliqués par le serveur
 function cheminListe({ page, statut, q, du, au }) {
   const params = new URLSearchParams({ page, taille: TAILLE_PAGE })
   if (statut) params.set('statut', statut)
@@ -56,7 +55,7 @@ function Pagination({ page, pages, total, taille, onChanger }) {
   )
 }
 
-// Bouton de suppression avec confirmation dans la ligne (pas de boîte de dialogue du navigateur)
+// Confirmation dans la ligne, sans boîte de dialogue du navigateur
 function SupprimerIntervention({ intervention, onSupprimee }) {
   const [confirmation, setConfirmation] = useState(false)
   const [envoi, setEnvoi] = useState(false)
@@ -117,7 +116,7 @@ export default function InterventionsPage() {
   const [recherche, setRecherche] = useState(q)
   const location = useLocation()
   // null : fermé ; 'nouvelle' : création ; sinon id de l'intervention modifiée.
-  // Le bouton « Nouvelle intervention » du tableau de bord arrive ici avec le formulaire ouvert.
+  // Le bouton du tableau de bord ouvre directement le formulaire
   const [formulaire, setFormulaire] = useState(() =>
     location.state?.nouvelle && user?.role === 'RESPONSABLE' ? 'nouvelle' : null,
   )
@@ -127,7 +126,7 @@ export default function InterventionsPage() {
   const compteurs = data?.compteurs ?? {}
   const totalGlobal = Object.values(compteurs).reduce((somme, n) => somme + n, 0)
 
-  // Met à jour les filtres dans l'URL ; tout changement de filtre ramène à la première page
+  // Tout changement de filtre ramène à la page 1
   function majFiltres(changements) {
     setSearchParams(
       (params) => {
@@ -140,7 +139,6 @@ export default function InterventionsPage() {
     )
   }
 
-  // La recherche part au serveur 300 ms après la dernière frappe
   useEffect(() => {
     const terme = recherche.trim()
     if (terme === q) return
@@ -149,7 +147,6 @@ export default function InterventionsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recherche, q])
 
-  // L'en-tête reste visible même en bas de liste : on remonte jusqu'au formulaire
   function ouvrirFormulaire(id) {
     setFormulaire(id)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -166,7 +163,6 @@ export default function InterventionsPage() {
 
   return (
     <div className="interventions">
-      {/* En-tête fixé sous la barre du haut : titre, création, filtres et recherche restent accessibles */}
       <div className="interventions__entete">
         <header className="interventions__header">
           <div>
@@ -175,7 +171,6 @@ export default function InterventionsPage() {
               {loading && !data ? 'Chargement…' : `${totalGlobal} intervention${totalGlobal > 1 ? 's' : ''} au total`}
             </p>
           </div>
-          {/* Seul le responsable crée des interventions */}
           {user?.role === 'RESPONSABLE' && (
             <Button onClick={() => ouvrirFormulaire('nouvelle')} disabled={formulaire === 'nouvelle'}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">

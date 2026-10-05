@@ -60,14 +60,13 @@ function ActionArchive({ client, onChange }) {
   )
 }
 
-// Liste des clients, externes et inscrits sur Carnet (actifs ou archivés) : recherche, actions par ligne
 export function ClientsListe({ archive = false, version = 0, onModifier }) {
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const q = searchParams.get('q') ?? ''
   const [saisie, setSaisie] = useState(q)
 
-  // La recherche part au serveur 300 ms après la dernière frappe ; elle est gardée dans l'URL
+  // Recherche gardée dans l'URL
   useEffect(() => {
     const terme = saisie.trim()
     if (terme === q) return
@@ -91,7 +90,6 @@ export function ClientsListe({ archive = false, version = 0, onModifier }) {
   if (q) params.set('q', q)
   const { data, loading, error, reload } = useFetch(`/clients?${params}`)
 
-  // Rechargement demandé par la page (client ajouté ou modifié)
   useEffect(() => {
     if (version > 0) reload()
   }, [version, reload])
@@ -164,7 +162,7 @@ export function ClientsListe({ archive = false, version = 0, onModifier }) {
                           <circle cx="12" cy="12" r="3" />
                         </Icone>
                       </Link>
-                      {/* Un client enregistré sur Carnet est en consultation seule : ni modification, ni archivage */}
+                      {/* Client Carnet : consultation seule */}
                       {onModifier && !client.compteClientId && (
                         <button type="button" className="clients__action" onClick={() => onModifier(client)} aria-label={`Modifier ${client.nom}`} title="Modifier">
                           <Icone>

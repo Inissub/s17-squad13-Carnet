@@ -1,6 +1,5 @@
 import './MenuBurger.css'
 
-// Bouton « burger » des menus mobiles : trois traits qui deviennent une croix quand le menu est ouvert
 export function BoutonBurger({ ouvert, onClick, controle, className = '' }) {
   return (
     <button

@@ -6,7 +6,7 @@ import { z } from "zod";
 
 export const clientsRouter = Router();
 
-// Le carnet de clients est géré par le responsable ; un technicien voit le client depuis ses interventions
+// Un technicien voit les clients depuis ses interventions
 clientsRouter.use(requireRole("RESPONSABLE"));
 
 const listeSchema = z.object({
@@ -55,7 +55,6 @@ function refuserSiCarnet(client) {
   }
 }
 
-// Liste de l'onglet Clients : clients externes (saisis par l'activité) et clients inscrits sur Carnet
 clientsRouter.get("/", async (req, res) => {
   const { archive, q } = listeSchema.parse(req.query);
   const clients = await prisma.client.findMany({
@@ -76,8 +75,7 @@ clientsRouter.get("/", async (req, res) => {
   res.json(clients);
 });
 
-// Comptes inscrits sur Carnet qui ne sont pas encore clients de l'activité, pour les ajouter.
-// Déclarée avant « /:id » pour que « comptes » ne soit pas pris pour un identifiant.
+// Déclarée avant « /:id », sinon « comptes » serait lu comme un identifiant
 clientsRouter.get("/comptes", async (req, res) => {
   const { q } = rechercheSchema.parse(req.query);
   const comptes = await prisma.compteClient.findMany({
@@ -123,7 +121,6 @@ clientsRouter.get("/:id", async (req, res) => {
   res.json(client);
 });
 
-// Nouveau client saisi par l'activité (sans compte sur Carnet)
 clientsRouter.post("/", async (req, res) => {
   const data = ficheSchema.parse(req.body);
   const client = await prisma.client.create({
@@ -133,7 +130,7 @@ clientsRouter.post("/", async (req, res) => {
   res.status(201).json(client);
 });
 
-// Ajout d'un client déjà inscrit sur Carnet : sa fiche reprend les coordonnées de son compte
+// La fiche reprend les coordonnées du compte
 clientsRouter.post("/depuis-compte", async (req, res) => {
   const { compteClientId } = compteSchema.parse(req.body);
   const { activiteId } = req.user;

@@ -2,7 +2,6 @@
   min-height: 100dvh;
 }
 
-/* Barre du haut sur toute la largeur : logo à gauche, utilisateur à droite */
 .dashboard-topbar {
   position: sticky;
   top: 0;
@@ -56,7 +55,6 @@
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
 }
 
-/* Barre latérale : onglets principaux en haut, onglets du compte en bas */
 .dashboard-sidebar {
   position: sticky;
   top: var(--header-height);
@@ -144,7 +142,7 @@
     margin-left: calc(-1 * var(--space-2));
   }
 
-  /* Petit écran : la barre latérale devient un tiroir qui glisse depuis la gauche */
+  /* Petit écran : tiroir depuis la gauche */
   .dashboard-sidebar {
     position: fixed;
     top: var(--header-height);

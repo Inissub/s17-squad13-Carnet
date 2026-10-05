@@ -1,4 +1,4 @@
-/* Bouton burger, masqué sur grand écran ; chaque layout décide quand l'afficher */
+/* Masqué par défaut : chaque layout décide quand l'afficher */
 .burger {
   display: none;
   flex-direction: column;
@@ -30,7 +30,6 @@
   transition: transform 0.2s, opacity 0.2s;
 }
 
-/* Les trois traits forment une croix quand le menu est ouvert */
 .burger--ouvert .burger__trait:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }

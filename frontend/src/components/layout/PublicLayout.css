@@ -101,14 +101,12 @@
   color: var(--ink);
 }
 
-/* Partie droite : menu du compte (connecté) et bouton burger (petit écran) */
 .public-header__droite {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
-/* Panneau du menu mobile, sous l'en-tête */
 .public-menu {
   position: absolute;
   top: 100%;
@@ -152,7 +150,6 @@
   font-size: 15px;
 }
 
-/* Voile sous le panneau : un clic à côté referme le menu */
 .public-header__voile {
   position: fixed;
   inset: var(--header-height) 0 0;
@@ -180,7 +177,6 @@
   }
 }
 
-/* Petit écran : les liens passent dans le menu burger */
 @media (max-width: 900px) {
   .public-header__nav {
     display: none;

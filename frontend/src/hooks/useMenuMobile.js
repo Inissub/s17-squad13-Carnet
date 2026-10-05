@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-// État d'un menu mobile (burger) : se ferme avec Échap et quand on repasse en affichage large
+// Se ferme avec Échap et au retour en affichage large
 export function useMenuMobile(largeurMax) {
   const [ouvert, setOuvert] = useState(false)
 
@@ -21,7 +21,6 @@ export function useMenuMobile(largeurMax) {
     ouvert,
     basculer: () => setOuvert((o) => !o),
     fermer: () => setOuvert(false),
-    // Un clic sur un lien du menu le referme (la page change)
     fermerSurLien: (e) => e.target.closest('a, button[data-ferme-menu]') && setOuvert(false),
   }
 }

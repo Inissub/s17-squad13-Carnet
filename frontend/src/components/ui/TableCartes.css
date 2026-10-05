@@ -1,6 +1,4 @@
-/* Tableaux de liste : sur petit écran, chaque ligne devient une carte.
-   Chaque cellule affiche son libellé (attribut data-label) à gauche et sa valeur à droite ;
-   la cellule « titre » occupe toute la largeur en haut, les actions se placent en bas. */
+/* Petit écran : chaque ligne devient une carte, libellés tirés de data-label */
 @media (max-width: 640px) {
   .table-cartes {
     min-width: 0 !important;
@@ -14,7 +12,7 @@
     display: block;
   }
 
-  /* La ligne devient une colonne, pour remonter le titre en premier quelle que soit sa colonne */
+  /* Colonne flex pour remonter le titre en premier */
   .table-cartes tbody tr {
     display: flex;
     flex-direction: column;
@@ -58,7 +56,6 @@
     margin-top: var(--space-1);
   }
 
-  /* Cellules sur toute la largeur (message vide, détail déplié) */
   .table-cartes tbody td[colspan] {
     display: block;
     text-align: left !important;

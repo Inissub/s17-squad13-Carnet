@@ -13,7 +13,6 @@ import { BUCKETS, dossiers, envoyerFichier, supprimerFichier, urlPublique } from
 
 export const activiteRouter = Router();
 
-// Les liens envoyés aux membres de l'équipe restent valables 3 jours
 const VALIDITE_INVITATION_HEURES = 72;
 
 const optionnel = z.preprocess((v) => (v === "" ? null : v), z.string().trim().nullable().optional());
@@ -96,8 +95,6 @@ async function envoyerLien(membre, jeton, modeleMail) {
   }
 }
 
-/* ---------- Membres actifs à qui l'on peut attribuer une intervention ---------- */
-
 activiteRouter.get("/techniciens", async (req, res) => {
   const techniciens = await prisma.utilisateur.findMany({
     where: { activiteId: req.user.activiteId, actif: true },
@@ -107,8 +104,6 @@ activiteRouter.get("/techniciens", async (req, res) => {
 
   res.json(techniciens);
 });
-
-/* ---------- Informations de l'activité (en-tête des devis, factures et rapports) ---------- */
 
 activiteRouter.get("/", async (req, res) => {
   const activite = await prisma.activite.findUnique({
@@ -125,7 +120,6 @@ activiteRouter.put("/", requireRole("RESPONSABLE"), async (req, res) => {
   res.json(presenterActivite(activite));
 });
 
-// Logo : bucket public, affiché sur la page et intégré dans les PDF
 activiteRouter.post("/logo", requireRole("RESPONSABLE"), uploadLogo, async (req, res) => {
   const { activiteId } = req.user;
   const ancien = await prisma.activite.findUnique({ where: { id: activiteId }, select: { logoChemin: true } });
@@ -152,8 +146,6 @@ activiteRouter.delete("/logo", requireRole("RESPONSABLE"), async (req, res) => {
   res.json(presenterActivite(activite));
 });
 
-/* ---------- Équipe : le responsable invite et gère ses techniciens ---------- */
-
 activiteRouter.get("/equipe", requireRole("RESPONSABLE"), async (req, res) => {
   const membres = await prisma.utilisateur.findMany({
     where: { activiteId: req.user.activiteId },
@@ -163,7 +155,6 @@ activiteRouter.get("/equipe", requireRole("RESPONSABLE"), async (req, res) => {
   res.json(membres.map(({ emailVerifieLe, ...m }) => ({ ...m, invitationEnAttente: !emailVerifieLe })));
 });
 
-// Création du compte d'un technicien : il reçoit un e-mail pour l'activer et choisir son mot de passe
 activiteRouter.post("/equipe", requireRole("RESPONSABLE"), async (req, res) => {
   const data = invitationSchema.parse(req.body);
   const [user, compte] = await Promise.all([
@@ -199,7 +190,7 @@ activiteRouter.put("/equipe/:id", requireRole("RESPONSABLE"), async (req, res) =
   res.status(204).end();
 });
 
-// Renvoie l'invitation (compte pas encore activé) ou un lien pour choisir un nouveau mot de passe
+// Invitation si le compte n'est pas activé, sinon nouveau mot de passe
 activiteRouter.post("/equipe/:id/lien", requireRole("RESPONSABLE"), async (req, res) => {
   const membre = await trouverMembre(req);
   if (!membre.actif) throw new HttpError(409, "Réactivez ce compte avant de lui envoyer un lien");

@@ -1,9 +1,7 @@
 import { formatMontant } from '../../utils/format.js'
 import { TYPES_LIGNE, montantLigne, nouvelleLigne } from './lignes.js'
 
-// Tableau de lignes d'un devis ou d'une facture : désignation, type, quantité, prix unitaire.
-// Chaque champ porte sa propre étiquette : masquée quand la ligne tient sur une rangée
-// (l'en-tête de colonnes suffit), affichée quand la ligne passe sur deux rangées.
+// Étiquettes masquées quand la ligne tient sur une rangée (l'en-tête suffit)
 export function LignesFormulaire({ lignes, onChange }) {
   const total = lignes.reduce((somme, l) => somme + montantLigne(l), 0)
 

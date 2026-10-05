@@ -63,7 +63,6 @@ const aujourdHui = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-// Requête de la liste : recherche et période sont filtrées par le serveur
 function cheminListe({ q, du, au }) {
   const params = new URLSearchParams()
   if (q) params.set('q', q)
@@ -282,7 +281,6 @@ function Factures() {
   const compteurs = data?.compteurs ?? {}
   const totaux = data?.totaux ?? { facture: 0, encaisse: 0, resteDu: 0 }
 
-  // Met à jour les filtres dans l'URL (lien partageable, retour arrière du navigateur)
   function majFiltres(changements) {
     setSearchParams(
       (params) => {
@@ -294,7 +292,6 @@ function Factures() {
     )
   }
 
-  // La recherche part au serveur 300 ms après la dernière frappe
   useEffect(() => {
     const terme = recherche.trim()
     if (terme === q) return

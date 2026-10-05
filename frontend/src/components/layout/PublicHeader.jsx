@@ -7,10 +7,9 @@ import { MenuCompte } from './MenuCompte.jsx'
 import { BoutonBurger } from './MenuBurger.jsx'
 import './PublicLayout.css'
 
-// Largeur sous laquelle les liens passent dans le menu burger (même valeur que dans PublicLayout.css)
+// Même valeur que dans PublicLayout.css
 const LARGEUR_MOBILE = 900
 
-// En-tête des pages publiques ; ancres : liens vers les sections de la landing
 export function PublicHeader({ ancres = false }) {
   const { user } = useAuth()
   const menu = useMenuMobile(LARGEUR_MOBILE)
@@ -23,7 +22,6 @@ export function PublicHeader({ ancres = false }) {
           <Logo />
         </span>
 
-        {/* Grand écran : liens en ligne */}
         <nav className="public-header__nav" aria-label="Navigation principale">
           <Link to="/techniciens" className="public-header__link">
             Trouver un technicien
@@ -59,7 +57,6 @@ export function PublicHeader({ ancres = false }) {
         </div>
       </div>
 
-      {/* Petit écran : panneau déroulé sous l'en-tête */}
       {menu.ouvert && (
         <>
           <div className="public-header__voile" onClick={menu.fermer} aria-hidden="true" />

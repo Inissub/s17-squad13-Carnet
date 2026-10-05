@@ -9,7 +9,7 @@ export const dashboardRouter = Router();
 const STATUTS = ["A_PLANIFIER", "PLANIFIEE", "EN_COURS", "TERMINEE", "ANNULEE"];
 
 const schema = z.object({
-  // Début de la journée du navigateur : les rendez-vous « à partir d'aujourd'hui » dépendent de son fuseau
+  // Début de journée dans le fuseau du navigateur
   depuis: z.coerce.date().optional(),
 });
 
