@@ -10,14 +10,13 @@ import { arrondi, soldes } from "./soldes.js";
 
 export const facturationRouter = Router();
 
-// La facturation est réservée au responsable de l'activité
 facturationRouter.use(requireRole("RESPONSABLE"));
 
 const STATUTS_PAIEMENT = ["NON_PAYEE", "PARTIELLE", "PAYEE"];
 
 const listeSchema = z.object({
   q: z.string().trim().optional(),
-  // Période d'émission, bornes calculées par le navigateur dans son fuseau
+  // Bornes calculées dans le fuseau du navigateur
   du: z.coerce.date().optional(),
   au: z.coerce.date().optional(),
 });
@@ -109,7 +108,7 @@ facturationRouter.post("/factures/:id/paiements", async (req, res) => {
   res.status(201).json(paiement);
 });
 
-// Reçu remis au client pour un paiement ; la situation de la facture est celle juste après ce paiement
+// Situation de la facture juste après ce paiement
 facturationRouter.get("/paiements/:id/recu", async (req, res) => {
   const paiement = await prisma.paiement.findFirst({
     where: { id: req.params.id, activiteId: req.user.activiteId },

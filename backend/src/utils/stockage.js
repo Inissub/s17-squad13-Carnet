@@ -53,7 +53,6 @@ export async function envoyerFichier({ bucket, dossier, fichier }) {
   return { chemin, typeMime: fichier.mimetype, taille: fichier.size, nomOriginal: fichier.originalname };
 }
 
-// Flux de lecture d'un fichier stocké en local (le serveur le renvoie lui-même)
 export async function lireFichierLocal(bucket, chemin) {
   const cible = cheminLocal(bucket, chemin);
   await stat(cible).catch(() => {
@@ -62,7 +61,6 @@ export async function lireFichierLocal(bucket, chemin) {
   return createReadStream(cible);
 }
 
-// Contenu complet d'un fichier (pour l'intégrer dans un PDF, par exemple)
 export async function lireFichier(bucket, chemin) {
   if (stockageLocal) return readFile(cheminLocal(bucket, chemin));
   const reponse = await client().send(new GetObjectCommand({ Bucket: bucket, Key: chemin }));

@@ -125,7 +125,7 @@ profilPublicRouter.patch("/", async (req, res) => {
   }
 });
 
-// Photo de profil : bucket public (affichée dans l'annuaire sans connexion)
+// Bucket public : la photo s'affiche dans l'annuaire sans connexion
 profilPublicRouter.post("/photo", uploadImage, async (req, res) => {
   const id = utilisateurId(req);
   const ancien = await prisma.utilisateur.findUnique({ where: { id }, select: { photoChemin: true } });
@@ -154,8 +154,6 @@ profilPublicRouter.delete("/photo", async (req, res) => {
   await supprimerFichier(BUCKETS.public, ancien.photoChemin).catch(() => {});
   res.json(presenter(profil));
 });
-
-/* ---------- Réalisations : galerie de travaux présentée sur le profil public ---------- */
 
 const MAX_REALISATIONS = 12;
 
@@ -193,7 +191,6 @@ profilPublicRouter.get("/realisations", async (req, res) => {
   res.json(realisations.map(presenterRealisation));
 });
 
-// Envoi en multipart : la photo (« fichier ») et les champs titre / description
 profilPublicRouter.post("/realisations", uploadImage, async (req, res) => {
   const id = utilisateurId(req);
   const data = realisationSchema.parse(req.body);

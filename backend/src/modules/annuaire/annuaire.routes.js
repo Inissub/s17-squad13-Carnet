@@ -31,7 +31,7 @@ const champsPublics = {
   },
 };
 
-// Réalisations : seulement sur la page d'un technicien, pas dans la liste de l'annuaire
+// Réalisations : uniquement sur la page d'un technicien
 const champsPage = {
   ...champsPublics,
   realisations: {
