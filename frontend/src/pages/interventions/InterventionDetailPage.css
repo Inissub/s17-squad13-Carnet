@@ -330,46 +330,145 @@
   font-size: 12px;
 }
 
-/* Lignes d'un devis ou d'une facture */
+/* Lignes d'un devis ou d'une facture.
+   La disposition dépend de la largeur du formulaire lui-même (container query), pas de l'écran :
+   le formulaire vit dans une colonne bien plus étroite que la fenêtre. */
 .lignes {
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
+/* Large : une ligne = une rangée, sous un en-tête de colonnes */
 .lignes__grille {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 150px 80px 130px 110px 28px;
+  grid-template-columns: minmax(160px, 1fr) 150px 90px 150px 120px 32px;
+  grid-template-areas: "designation type quantite prix total retirer";
   align-items: center;
   gap: var(--space-3);
 }
+
+.lignes__zone--designation { grid-area: designation; }
+.lignes__zone--type { grid-area: type; }
+.lignes__zone--quantite { grid-area: quantite; }
+.lignes__zone--prix { grid-area: prix; }
+.lignes__zone--total { grid-area: total; }
+.lignes__zone--retirer { grid-area: retirer; }
 
 .lignes__titres {
   font-size: 13px;
   color: var(--muted);
 }
 
+.lignes__champ {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* Étiquette de chaque champ : lue par les lecteurs d'écran, visible seulement en disposition étroite */
+.lignes__etiquette {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Champs numériques : sans flèches, pour laisser toute la place au montant */
+.lignes__nombre {
+  text-align: right;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.lignes__nombre::-webkit-outer-spin-button,
+.lignes__nombre::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
 .lignes__total {
-  font-size: 13px;
+  font-size: 14px;
   text-align: right;
   white-space: nowrap;
 }
 
 .lignes__retirer {
+  width: 32px;
+  height: 32px;
   border: 0;
+  border-radius: var(--radius-sm);
   background: none;
-  font-size: 18px;
+  font-size: 20px;
+  line-height: 1;
   color: var(--muted);
   cursor: pointer;
 }
 
 .lignes__retirer:hover:not(:disabled) {
+  background: var(--err-soft);
   color: var(--err);
 }
 
 .lignes__retirer:disabled {
   opacity: 0.3;
   cursor: default;
+}
+
+/* Étroit : la ligne passe sur deux rangées, chaque champ avec son étiquette */
+@container (max-width: 760px) {
+  .lignes__titres {
+    display: none;
+  }
+
+  .lignes__ligne {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-areas:
+      "designation designation designation retirer"
+      "type quantite prix total";
+    align-items: end;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .lignes__ligne .lignes__zone--retirer {
+    justify-self: end;
+    align-self: start;
+  }
+
+  .lignes__ligne .lignes__zone--designation {
+    padding-right: var(--space-2);
+  }
+
+  .lignes__etiquette {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .lignes__zone--total {
+    align-items: flex-end;
+    padding-bottom: 12px;
+  }
+}
+
+/* Très étroit (téléphone) : type et quantité, puis prix et total */
+@container (max-width: 440px) {
+  .lignes__ligne {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 32px;
+    grid-template-areas:
+      "designation designation retirer"
+      "type quantite quantite"
+      "prix total total";
+  }
 }
 
 .lignes__pied {
@@ -440,12 +539,6 @@
   font-size: 12px;
 }
 
-@media (max-width: 1300px) {
-  .lignes__grille {
-    grid-template-columns: minmax(0, 1fr) 130px 70px 110px 100px 28px;
-  }
-}
-
 @media (max-width: 1100px) {
   .detail__corps {
     grid-template-columns: minmax(0, 1fr);
@@ -481,21 +574,6 @@
 
   .validation__ligne {
     flex-direction: column;
-  }
-
-  /* Une ligne de devis s'affiche en carte : désignation sur toute la largeur */
-  .lignes__titres {
-    display: none;
-  }
-
-  .lignes__grille {
-    grid-template-columns: 1fr 1fr 28px;
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .lignes__grille > :first-child {
-    grid-column: 1 / -1;
   }
 
   .chiffrage__montant {

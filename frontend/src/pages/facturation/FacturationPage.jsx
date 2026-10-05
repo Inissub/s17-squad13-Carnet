@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { useFetch } from '../../hooks/useFetch.js'
 import { formatDate, formatMontant } from '../../utils/format.js'
 import './FacturationPage.css'
+import '../../components/ui/TableCartes.css'
 
 const STATUTS = [
   { value: 'NON_PAYEE', label: 'Non payée', tone: 'err' },
@@ -183,7 +184,7 @@ function Paiements({ facture, onEnregistre }) {
 function TableFactures({ factures, factureOuverte, onOuvrirFacture, onPaiement }) {
   return (
     <div className="factures__scroll">
-      <table className="factures__table">
+      <table className="factures__table table-cartes">
         <thead>
           <tr>
             <th>Émise le</th>
@@ -204,29 +205,29 @@ function TableFactures({ factures, factureOuverte, onOuvrirFacture, onPaiement }
             return (
               <Fragment key={f.id}>
                 <tr className={deplie ? 'factures__ligne--ouverte' : ''}>
-                  <td className="factures__date">{formatDate(f.dateEmission)}</td>
-                  <td>
+                  <td data-label="Émise le" className="factures__date">{formatDate(f.dateEmission)}</td>
+                  <td className="table-cartes__titre">
                     <Link to={`/dashboard/interventions/${f.intervention.id}`} className="factures__intervention">
                       {f.intervention.objet}
                     </Link>
                     <span className="factures__sous muted">{f.intervention.reference}</span>
                   </td>
-                  <td>
+                  <td data-label="Statut">
                     <span className="factures__statut">
                       <Badge tone={statut.tone}>{statut.label}</Badge>
                     </span>
                   </td>
-                  <td>{f.intervention.client.nom}</td>
-                  <td className="factures__nombre">{formatMontant(f.total)}</td>
-                  <td className={`factures__nombre ${f.resteDu > 0 ? '' : 'muted'}`}>
+                  <td data-label="Client">{f.intervention.client.nom}</td>
+                  <td data-label="Total" className="factures__nombre">{formatMontant(f.total)}</td>
+                  <td data-label="Reste dû" className={`factures__nombre ${f.resteDu > 0 ? '' : 'muted'}`}>
                     {f.resteDu > 0 ? <strong>{formatMontant(f.resteDu)}</strong> : formatMontant(0)}
                   </td>
-                  <td>
+                  <td data-label="Réf.">
                     <a href={pdf} target="_blank" rel="noreferrer" className="factures__ref">
                       {f.reference}
                     </a>
                   </td>
-                  <td className="factures__actions">
+                  <td className="factures__actions table-cartes__actions">
                     <a href={pdf} target="_blank" rel="noreferrer" className="factures__action" aria-label={`Voir la facture ${f.reference}`} title="Voir">
                       <Icone nom="oeil" />
                     </a>

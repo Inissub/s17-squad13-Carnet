@@ -7,6 +7,7 @@ import '../../components/ui/Filtres.css'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useFetch } from '../../hooks/useFetch.js'
 import './ClientsListe.css'
+import '../../components/ui/TableCartes.css'
 
 function Icone({ children }) {
   return (
@@ -130,7 +131,7 @@ export function ClientsListe({ archive = false, version = 0, onModifier }) {
           </p>
         ) : (
           <div className="clients__scroll">
-            <table className="clients__table">
+            <table className="clients__table table-cartes">
               <thead>
                 <tr>
                   <th>Client</th>
@@ -143,20 +144,20 @@ export function ClientsListe({ archive = false, version = 0, onModifier }) {
               <tbody>
                 {clients.map((client) => (
                   <tr key={client.id}>
-                    <td>
+                    <td className="table-cartes__titre">
                       <Link to={`/dashboard/clients/${client.id}`} className="clients__nom">
                         {client.nom}
                       </Link>
                       <span className="clients__sous muted">{client.adresse || 'Adresse non renseignée'}</span>
                     </td>
-                    <td className={client.telephone ? 'clients__tel' : 'muted'}>{client.telephone || '—'}</td>
-                    <td>
+                    <td data-label="Téléphone" className={client.telephone ? 'clients__tel' : 'muted'}>{client.telephone || '—'}</td>
+                    <td data-label="Statut">
                       <BadgeClient client={client} />
                     </td>
-                    <td>
+                    <td data-label="Interventions">
                       {client._count.interventions} intervention{client._count.interventions > 1 ? 's' : ''}
                     </td>
-                    <td className="clients__actions">
+                    <td className="clients__actions table-cartes__actions">
                       <Link to={`/dashboard/clients/${client.id}`} className="clients__action" aria-label={`Voir ${client.nom}`} title="Voir">
                         <Icone>
                           <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />

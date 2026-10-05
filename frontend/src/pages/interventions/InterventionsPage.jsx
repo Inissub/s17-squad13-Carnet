@@ -11,6 +11,7 @@ import { formatJourHeure } from '../../utils/format.js'
 import { PRIORITES, STATUTS, getStatut } from '../../utils/interventions.js'
 import { FormulaireIntervention } from './FormulaireIntervention.jsx'
 import './InterventionsPage.css'
+import '../../components/ui/TableCartes.css'
 
 const TAILLE_PAGE = 20
 
@@ -269,7 +270,7 @@ export default function InterventionsPage() {
           </p>
         ) : (
           <div className="interventions__scroll">
-            <table className="interventions__table">
+            <table className="interventions__table table-cartes">
               <thead>
                 <tr>
                   <th>Date prévue</th>
@@ -289,39 +290,39 @@ export default function InterventionsPage() {
                   const date = i.datePrevue ? new Date(i.datePrevue) : null
                   return (
                     <tr key={i.id}>
-                      <td className="interventions__date">
+                      <td data-label="Date prévue" className="interventions__date">
                         {date ? (
                           formatJourHeure(date)
                         ) : (
                           <span className="muted">Non planifiée</span>
                         )}
                       </td>
-                      <td>
+                      <td className="table-cartes__titre">
                         <Link to={`/dashboard/interventions/${i.id}`} className="interventions__objet">
                           {i.objet}
                         </Link>
                         {i.adresse && <span className="interventions__sous muted">{i.adresse}</span>}
                       </td>
-                      <td>
+                      <td data-label="Statut">
                         <span className="interventions__statut">
                           <Badge tone={statut.tone}>{statut.label}</Badge>
                         </span>
                       </td>
-                      <td>
+                      <td data-label="Priorité">
                         {priorite.tone === 'neutral' ? (
                           <span className="muted">{priorite.label}</span>
                         ) : (
                           <Badge tone={priorite.tone}>{priorite.label}</Badge>
                         )}
                       </td>
-                      <td>{i.client?.nom ?? '—'}</td>
-                      <td className={i.technicien ? '' : 'muted'}>{i.technicien?.nom ?? 'Non attribuée'}</td>
-                      <td>
+                      <td data-label="Client">{i.client?.nom ?? '—'}</td>
+                      <td data-label="Technicien" className={i.technicien ? '' : 'muted'}>{i.technicien?.nom ?? 'Non attribuée'}</td>
+                      <td data-label="Réf.">
                         <Link to={`/dashboard/interventions/${i.id}`} className="interventions__ref">
                           {i.reference}
                         </Link>
                       </td>
-                      <td className="interventions__actions">
+                      <td className="interventions__actions table-cartes__actions">
                         <Link
                           to={`/dashboard/interventions/${i.id}`}
                           className="interventions__action"
