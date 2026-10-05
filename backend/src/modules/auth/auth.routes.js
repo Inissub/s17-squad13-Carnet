@@ -190,8 +190,7 @@ authRouter.post("/activation/renvoyer", async (req, res) => {
   res.json({ message: "Si un compte non activé existe pour cette adresse, un nouveau lien vient d'être envoyé." });
 });
 
-// Lien d'invitation (technicien créé par le responsable) ou de nouveau mot de passe :
-// la personne choisit son mot de passe, le compte est activé et la session ouverte
+// Invitation ou nouveau mot de passe : le compte est activé et la session ouverte
 const invitationSchema = z.object({
   jeton: z.string().min(1, "Lien invalide"),
   motDePasse: z.string().min(8, "Le mot de passe doit faire au moins 8 caractères"),

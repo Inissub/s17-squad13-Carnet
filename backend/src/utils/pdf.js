@@ -21,7 +21,6 @@ export const formatDateHeure = (valeur) => (valeur ? propre(dateHeure.format(new
 
 const LIBELLES_TYPE = { MAIN_OEUVRE: "Main-d'œuvre", MATERIEL: "Matériel" };
 
-// Ouvre un PDF envoyé directement dans la réponse HTTP
 export function ouvrirPdf(res, nomFichier) {
   const doc = new PDFDocument({ size: "A4", margin: MARGE, info: { Title: nomFichier } });
   res.setHeader("Content-Type", "application/pdf");
@@ -36,14 +35,13 @@ function verifierPlace(doc, hauteur) {
   if (doc.y + hauteur > doc.page.height - MARGE) doc.addPage();
 }
 
-// Charge le logo de l'activité (bucket public) pour l'en-tête ; un logo illisible n'empêche pas le PDF
+// Un logo illisible n'empêche pas de produire le PDF
 export async function avecLogo(activite) {
   if (!activite.logoChemin) return { ...activite, logo: null };
   const logo = await lireFichier(BUCKETS.public, activite.logoChemin).catch(() => null);
   return { ...activite, logo };
 }
 
-// En-tête : logo et coordonnées de l'activité à gauche, type et référence du document à droite
 export function entete(doc, activite, { titre, reference, dateDocument }) {
   const haut = doc.y;
   let yTexte = haut;
@@ -71,7 +69,6 @@ export function entete(doc, activite, { titre, reference, dateDocument }) {
   doc.moveDown(1.2);
 }
 
-// Deux colonnes : client et intervention
 export function blocClient(doc, intervention) {
   const haut = doc.y;
   const colonne = largeur(doc) / 2 - 10;
@@ -94,7 +91,6 @@ export function blocClient(doc, intervention) {
   doc.y = Math.max(basGauche, doc.y) + 24;
 }
 
-// Tableau des lignes (devis ou facture) suivi du total
 export function tableauLignes(doc, lignes, devise) {
   const l = largeur(doc);
   const colonnes = [
@@ -152,7 +148,6 @@ const LIBELLES_MODE = {
 };
 const VERT = "#1f8a4c";
 
-// Paiements reçus sur une facture, puis récapitulatif : total, déjà payé, reste à payer
 export function blocPaiements(doc, paiements, total, devise) {
   if (!paiements.length) return;
   const l = largeur(doc);
@@ -196,7 +191,6 @@ export function blocPaiements(doc, paiements, total, devise) {
   doc.moveDown(1.2);
 }
 
-// Corps d'un reçu : somme reçue (chiffres et lettres), objet du paiement, situation de la facture
 export function corpsRecu(doc, { client, montant, montantLettres, mode, reference, facture, situation, devise }) {
   const l = largeur(doc);
   const haut = doc.y;
@@ -238,7 +232,6 @@ export function corpsRecu(doc, { client, montant, montantLettres, mode, referenc
     doc.font("Helvetica-Bold").fontSize(11).fillColor(VERT).text("FACTURE SOLDÉE", MARGE, doc.y, { width: l, align: "right" });
   }
 
-  // Signature de l'entreprise
   doc.moveDown(3);
   verifierPlace(doc, 80);
   const y = doc.y;
@@ -248,7 +241,6 @@ export function corpsRecu(doc, { client, montant, montantLettres, mode, referenc
   doc.x = MARGE;
 }
 
-// Section titrée avec un texte libre (ignorée si vide)
 export function section(doc, titre, texte) {
   if (!texte) return;
   verifierPlace(doc, 50);
@@ -265,7 +257,7 @@ export function titreSection(doc, titre) {
   doc.moveDown(0.6);
 }
 
-// Grille de photos (JPEG/PNG uniquement : pdfkit ne lit pas le WebP)
+// JPEG et PNG uniquement : pdfkit ne lit pas le WebP
 export function photos(doc, images) {
   const taille = 150;
   const espace = 12;

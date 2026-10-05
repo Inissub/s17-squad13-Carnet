@@ -138,8 +138,6 @@ documentsRouter.post("/factures", requireRole("RESPONSABLE"), async (req, res) =
   res.status(201).json(facture);
 });
 
-/* ---------- PDF ---------- */
-
 async function chargerPourPdf(req) {
   const intervention = await prisma.intervention.findFirst({
     where: { id: req.params.id, ...perimetre(req.user) },
@@ -190,7 +188,6 @@ documentsRouter.get("/factures/:factureId/pdf", async (req, res) => {
   });
   blocClient(doc, intervention);
   const total = tableauLignes(doc, facture.lignes, intervention.activite.devise);
-  // Les acomptes et paiements déjà reçus apparaissent sur la facture
   blocPaiements(doc, facture.paiements, total, intervention.activite.devise);
   if (facture.devis) section(doc, "Référence du devis", facture.devis.reference);
   if (facture.dateEcheance) section(doc, "Échéance", formatDate(facture.dateEcheance));

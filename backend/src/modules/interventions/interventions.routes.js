@@ -11,7 +11,6 @@ export const interventionsRouter = Router();
 
 const optionnel = z.preprocess((v) => (v === "" ? undefined : v), z.string().trim().optional());
 
-// Le client est l'une des fiches de l'activité (onglet Clients)
 const champs = z.object({
   clientId: z.string({ error: "Client requis" }).min(1, "Client requis"),
   objet: z.string().trim().min(3, "Objet trop court"),
@@ -37,7 +36,7 @@ const listeSchema = z.object({
   taille: z.coerce.number().int().min(1).max(100).default(20),
   statut: statut.optional().catch(undefined),
   q: z.string().trim().optional(),
-  // Bornes de la journée filtrée, calculées par le navigateur dans son fuseau
+  // Bornes calculées dans le fuseau du navigateur
   du: z.coerce.date().optional(),
   au: z.coerce.date().optional(),
 });
@@ -54,7 +53,6 @@ const selectListe = {
   technicien: { select: { id: true, nom: true } },
 };
 
-// Fiche client de l'activité (ajoutée depuis l'onglet Clients)
 async function resoudreClient(tx, activiteId, data, clientActuelId) {
   const client = await tx.client.findFirst({
     // Une fiche archivée reste acceptée si l'intervention y est déjà rattachée
@@ -70,9 +68,7 @@ async function verifierTechnicien(tx, activiteId, technicienId) {
   if (!technicien) throw new HttpError(400, "Technicien introuvable");
 }
 
-// Clients proposés dans le formulaire d'intervention : uniquement ceux ajoutés dans l'onglet Clients
-// (externes et enregistrés sur Carnet), hors archives.
-// Déclarée avant les routes « /:id » pour que « clients » ne soit pas pris pour un identifiant.
+// Déclarée avant « /:id », sinon « clients » serait lu comme un identifiant
 interventionsRouter.get("/clients", async (req, res) => {
   const clients = await prisma.client.findMany({
     where: { activiteId: req.user.activiteId, archive: false },
@@ -125,7 +121,6 @@ interventionsRouter.get("/", async (req, res) => {
   });
 });
 
-// Seul le responsable crée des interventions ; un technicien travaille sur celles qui lui sont attribuées
 interventionsRouter.post("/", requireRole("RESPONSABLE"), async (req, res) => {
   const { id: utilisateurId, activiteId } = req.user;
   const data = creationSchema.parse(req.body);
@@ -202,5 +197,4 @@ interventionsRouter.delete("/:id", requireRole("RESPONSABLE"), async (req, res) 
   res.status(204).end();
 });
 
-// Fiche détaillée et suivi : rapport, statut, validation, pièces jointes
 interventionsRouter.use("/:id", detailRouter);

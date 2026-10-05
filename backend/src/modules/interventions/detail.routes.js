@@ -30,7 +30,7 @@ const rapportSchema = z.object({
   observations: texteLibre,
 });
 
-// Changements de statut proposés par les boutons de la fiche ; « Terminée » passe par la validation
+// « Terminée » passe par la validation des travaux
 const TRANSITIONS = {
   EN_COURS: ["A_PLANIFIER", "PLANIFIEE"],
   ANNULEE: ["A_PLANIFIER", "PLANIFIEE", "EN_COURS"],
@@ -130,7 +130,6 @@ detailRouter.put("/rapport", async (req, res) => {
   res.json(rapport);
 });
 
-// Le client (ou son représentant) valide les travaux : l'intervention passe à « Terminée »
 detailRouter.post("/validation", async (req, res) => {
   const { valideParNom } = validationSchema.parse(req.body);
   await prisma.$transaction(async (tx) => {
@@ -150,7 +149,6 @@ detailRouter.post("/validation", async (req, res) => {
   res.status(204).end();
 });
 
-// Photos avant/après (images) et documents (images ou PDF)
 detailRouter.post(
   "/pieces",
   (req, res, next) => {
@@ -197,5 +195,4 @@ detailRouter.delete("/pieces/:pieceId", async (req, res) => {
   res.status(204).end();
 });
 
-// Devis, factures et PDF
 detailRouter.use(documentsRouter);

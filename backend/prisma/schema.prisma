@@ -120,7 +120,6 @@ model Utilisateur {
   @@index([activiteId])
 }
 
-// Réalisation présentée sur le profil public d'un technicien (photo dans le bucket public)
 model Realisation {
   id            String   @id @default(uuid())
   utilisateurId String
@@ -326,7 +325,7 @@ model Paiement {
   date       DateTime
   mode       ModePaiement
   reference  String?
-  // Numéro du reçu remis au client : REC-2026-0001, attribué à l'enregistrement du paiement
+  // REC-2026-0001, attribué à l'enregistrement du paiement
   numeroRecu String
   createdAt  DateTime     @default(now())
 

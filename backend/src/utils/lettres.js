@@ -5,7 +5,6 @@ const UNITES = [
 ];
 const DIZAINES = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante", "quatre-vingt", "quatre-vingt"];
 
-// 0 à 99
 function deuxChiffres(n) {
   if (n < 20) return UNITES[n];
   const d = Math.floor(n / 10);

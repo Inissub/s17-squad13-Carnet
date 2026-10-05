@@ -73,7 +73,6 @@ Ce lien est valable ${heures} heures. Si vous n'êtes pas à l'origine de cette 
   return { subject, text, html };
 }
 
-// Invitation d'un technicien par le responsable : il choisit son mot de passe en activant son compte
 export function mailInvitation({ nom, activite, invitePar, lien, heures }) {
   const subject = `${activite} vous invite sur ${APP}`;
   const text = `Bonjour ${nom},
@@ -94,7 +93,6 @@ Ce lien est valable ${heures} heures. Vous retrouverez ensuite les interventions
   return { subject, text, html };
 }
 
-// Nouveau mot de passe demandé par le responsable pour un membre de l'équipe
 export function mailNouveauMotDePasse({ nom, activite, lien, heures }) {
   const subject = `Choisissez un nouveau mot de passe ${APP}`;
   const text = `Bonjour ${nom},
