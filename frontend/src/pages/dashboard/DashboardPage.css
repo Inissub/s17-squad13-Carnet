@@ -44,6 +44,9 @@
 .accueil__cote {
   position: sticky;
   top: calc(var(--header-height) + var(--space-5));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
 }
 
 .accueil__carte {
@@ -58,6 +61,8 @@
 }
 
 .accueil__puce {
+  flex-shrink: 0;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -280,5 +285,91 @@
   .tuiles--3 .tuile + .tuile {
     border-left: 0;
     border-top: 1px solid var(--line);
+  }
+}
+
+
+/* --- Ajouts pour le mini-classement et les spécialités --- */
+
+.classement {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 var(--space-5);
+  list-style: none;
+}
+
+.classement__ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.classement__ligne:last-child {
+  border-bottom: none;
+}
+
+.classement__nom {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.classement__nom strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.classement__nom .muted {
+  font-size: 13px;
+}
+
+.classement__mesures {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.classement__mesure {
+  white-space: nowrap;
+}
+
+.classement__note {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Message de carte vide : les cartes du tableau de bord n'ont pas de marge intérieure */
+.accueil__carte > .muted {
+  padding: var(--space-4) var(--space-5);
+}
+
+/* Lignes non cliquables : pas d'effet au survol */
+.repartition__ligne--statique:hover {
+  background: var(--bg);
+}
+
+@media (max-width: 600px) {
+  .classement {
+    padding-inline: var(--space-4);
+  }
+
+  .classement__ligne {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .classement__mesures {
+    justify-content: flex-start;
   }
 }
