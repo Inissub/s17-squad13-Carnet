@@ -26,7 +26,29 @@ async function nettoyer() {
   await prisma.compteClient.deleteMany({ where: { email: { in: EMAILS_CLIENTS } } });
 }
 
+// Le seed crée des comptes au mot de passe connu et supprime les données de démo existantes :
+// il ne doit tourner que sur une base locale, sauf demande explicite (SEED_FORCE=1)
+function verifierBaseLocale() {
+  if (process.env.SEED_FORCE === "1") return;
+  let hote = "";
+  try {
+    hote = new URL(process.env.DATABASE_URL).hostname;
+  } catch {
+    // Adresse illisible : traitée comme distante
+  }
+  const locale = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(hote);
+  if (process.env.NODE_ENV === "production" || !locale) {
+    console.error(
+      `Seed refusé : la base « ${hote || "inconnue"} » n'est pas locale ou NODE_ENV vaut production.\n` +
+        "Les comptes de démo (mot de passe connu) n'ont rien à faire en production.\n" +
+        "Pour forcer malgré tout : SEED_FORCE=1 npm run db:seed",
+    );
+    process.exit(1);
+  }
+}
+
 async function main() {
+  verifierBaseLocale();
   await nettoyer();
   const hash = await bcrypt.hash("demo12345", 12);
 

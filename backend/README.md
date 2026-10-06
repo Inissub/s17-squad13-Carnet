@@ -13,7 +13,10 @@ npm run db:seed
 npm run dev
 ```
 
-L'API tourne sur http://localhost:3000/api.
+L'API tourne sur http://localhost:3001/api.
+
+Le client Prisma (`src/generated/`) n'est pas versionné : il est créé par `npm install`
+(script `postinstall`). Après une modification de `prisma/schema.prisma`, relancer `npx prisma generate`.
 
 ## Scripts
 
@@ -25,6 +28,8 @@ L'API tourne sur http://localhost:3000/api.
 
 ## Comptes de démo
 
+Pour le développement uniquement. Le seed refuse de s'exécuter en production ou sur une base distante.
+
 Mot de passe : `demo12345`
 
 - Responsable : demo@carnet.test
@@ -33,17 +38,17 @@ Mot de passe : `demo12345`
 
 ## Modules
 
-| Module | Route | Responsable |
+| Module | Route | Contributeur |
 |---|---|---|
-| auth | /api/auth | Ketsia GOMA |
+| auth | /api/auth | Berenis MASSAMBA |
 | annuaire | /api/annuaire | Steven BOTOKO |
 | espace-client | /api/espace-client | Steven BOTOKO |
 | dashboard | /api/dashboard | Précieux MAVOUNGOU BAYONNE |
-| interventions | /api/interventions | Tony Bérenger KEDO |
-| clients | /api/clients | Steven KILONDA |
+| interventions | /api/interventions | Berenis MASSAMBA |
+| clients | /api/clients | Ketsia GOMA |
 | facturation | /api/facturation | Berenis MASSAMBA |
 | profil-public | /api/profil-public | Steven BOTOKO |
-| activite | /api/activite | Précieux MAVOUNGOU BAYONNE |
+| activite | /api/activite | Berenis MASSAMBA |
 
 Seuls `auth` et `annuaire` sont accessibles sans connexion.
 
@@ -51,11 +56,18 @@ Seuls `auth` et `annuaire` sont accessibles sans connexion.
 
 Les fichiers sont stockés sur Cloudflare R2. Demander les variables `R2_*` et les ajouter dans `.env`.
 
-- `carnet-prives` : photos d'intervention, documents, logo
-- `carnet-publics` : photos de profil, réalisations
+- `carnet-numerique-prive` : photos et documents d'intervention, servis par l'API avec un lien signé
+- `carnet-numerique` (public) : logo de l'activité, photos de profil, réalisations
 
-Utiliser `uploadImage` / `uploadDocument` (`middleware/upload.js`) puis les fonctions de `utils/stockage.js`.
+Sans R2 configuré, les fichiers sont enregistrés en local dans `backend/uploads/` (ignoré par git).
+
+Utiliser `uploadImage` / `uploadDocument` / `uploadLogo` (`middleware/upload.js`) puis les fonctions de `utils/stockage.js`.
 En base on enregistre le chemin du fichier, pas l'URL.
+
+## E-mails
+
+Activation des comptes, invitation des techniciens et nouveau mot de passe passent par SMTP (variables `SMTP_*`).
+Sans `SMTP_HOST`, les e-mails sont affichés dans la console du backend.
 
 ## Règles
 
