@@ -67,7 +67,7 @@ dashboardRouter.get("/", async (req, res) => {
     };
   }
 
-    // --- Mini-classement + spécialité la plus demandée : RESPONSABLE uniquement ---
+  // Classement de l'équipe et spécialités demandées : responsable uniquement
   let classement = null;
   let specialites = null;
 
@@ -158,5 +158,7 @@ dashboardRouter.get("/", async (req, res) => {
     total: Object.values(compteurs).reduce((a, b) => a + b, 0),
     prochains,
     facturation,
+    classement,
+    specialites,
   });
 });

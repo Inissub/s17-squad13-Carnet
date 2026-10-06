@@ -43,6 +43,8 @@ const ICONES = {
       <path d="M3 10h18M16 15h2" />
     </>
   ),
+  classement: <path d="M4 20V14h4v6M10 20V9h4v11M16 20V4h4v16M3 20h18" />,
+  specialite: <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4Z" />,
 }
 
 function Icone({ nom }) {
@@ -225,7 +227,7 @@ function Specialites({ specialites }) {
     <Card
       className="accueil__carte accueil__repartition"
       title="Spécialités demandées"
-      action={<span className="accueil__puce">30 derniers jours</span>}
+      action={<span className="accueil__puce">30 jours</span>}
     >
       {specialites.length === 0 ? (
         <p className="muted">Pas encore assez de données.</p>
@@ -289,7 +291,7 @@ export default function DashboardPage() {
     )
   }
 
-  const { compteurs, total, prochains, facturation } = data
+  const { compteurs, total, prochains, facturation, classement, specialites } = data
 
   return (
     <div className="accueil">
@@ -330,10 +332,13 @@ export default function DashboardPage() {
               </div>
             </Card>
           )}
+
+          {classement && <Classement classement={classement} />}
         </div>
 
         <aside className="accueil__cote">
           <RepartitionStatuts compteurs={compteurs} total={total} />
+          {specialites && <Specialites specialites={specialites} />}
         </aside>
       </div>
     </div>
