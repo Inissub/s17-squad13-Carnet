@@ -43,6 +43,8 @@ const ICONES = {
       <path d="M3 10h18M16 15h2" />
     </>
   ),
+  classement: <path d="M4 20V14h4v6M10 20V9h4v11M16 20V4h4v16M3 20h18" />,
+  specialite: <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4Z" />,
 }
 
 function Icone({ nom }) {
@@ -175,6 +177,78 @@ function RepartitionStatuts({ compteurs, total }) {
   )
 }
 
+// Mini-classement : interventions terminées sur 7 jours, charge en cours, note moyenne.
+// Visible uniquement par le responsable, présenté comme répartition de charge, pas comme compétition.
+function Classement({ classement }) {
+  return (
+    <Card
+      className="accueil__carte"
+      title="Équipe cette semaine"
+      action={
+        <span className="accueil__puce">
+          <Icone nom="classement" /> 7 derniers jours
+        </span>
+      }
+    >
+      {classement.length === 0 ? (
+        <p className="muted">Aucun technicien actif pour le moment.</p>
+      ) : (
+        <ul className="classement">
+          {classement.map((t) => (
+            <li key={t.id} className="classement__ligne">
+              <div className="classement__nom">
+                <strong>{t.nom}</strong>
+                {t.metier && <span className="muted">{t.metier}</span>}
+              </div>
+              <div className="classement__mesures">
+                <span className="classement__mesure" title="Interventions terminées cette semaine">
+                  {t.termineesSemaine} terminée{t.termineesSemaine > 1 ? 's' : ''}
+                </span>
+                <span className="classement__mesure muted" title="Interventions planifiées ou en cours">
+                  {t.chargeActuelle} en charge
+                </span>
+                {t.noteMoyenne != null && (
+                  <span className="classement__mesure classement__note" title="Note moyenne des avis">
+                    ★ {t.noteMoyenne}
+                  </span>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  )
+}
+
+// Spécialité la plus demandée : répartition des interventions des 30 derniers jours par métier du technicien.
+function Specialites({ specialites }) {
+  return (
+    <Card
+      className="accueil__carte accueil__repartition"
+      title="Spécialités demandées"
+      action={<span className="accueil__puce">30 jours</span>}
+    >
+      {specialites.length === 0 ? (
+        <p className="muted">Pas encore assez de données.</p>
+      ) : (
+        <ul className="repartition">
+          {specialites.map((s) => (
+            <li key={s.metier}>
+              <div className="repartition__ligne repartition__ligne--statique">
+                <Icone nom="specialite" />
+                <span className="repartition__libelle">{s.metier}</span>
+                <span className="repartition__nombre">{s.nombre}</span>
+                <span className="repartition__part">{s.part}%</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  )
+}
+
 export default function DashboardPage() {
   const { user } = useAuth()
   // Calculé une fois : la requête ne doit pas changer à chaque rendu
@@ -217,7 +291,7 @@ export default function DashboardPage() {
     )
   }
 
-  const { compteurs, total, prochains, facturation } = data
+  const { compteurs, total, prochains, facturation, classement, specialites } = data
 
   return (
     <div className="accueil">
@@ -258,10 +332,13 @@ export default function DashboardPage() {
               </div>
             </Card>
           )}
+
+          {classement && <Classement classement={classement} />}
         </div>
 
         <aside className="accueil__cote">
           <RepartitionStatuts compteurs={compteurs} total={total} />
+          {specialites && <Specialites specialites={specialites} />}
         </aside>
       </div>
     </div>

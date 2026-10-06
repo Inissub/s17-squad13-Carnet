@@ -13,6 +13,14 @@ const schema = z.object({
   depuis: z.coerce.date().optional(),
 });
 
+// Borne de 7 jours glissants pour le mini-classement de la semaine
+function debutSemaine() {
+  const d = new Date();
+  d.setDate(d.getDate() - 7);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 dashboardRouter.get("/", async (req, res) => {
   const { depuis = new Date() } = schema.parse(req.query);
   const base = perimetre(req.user);
@@ -59,10 +67,98 @@ dashboardRouter.get("/", async (req, res) => {
     };
   }
 
+  // Classement de l'équipe et spécialités demandées : responsable uniquement
+  let classement = null;
+  let specialites = null;
+
+  if (responsable) {
+    const [techniciens, terminees, enCours, avis] = await Promise.all([
+      // Tous les techniciens actifs de l'activité
+      prisma.utilisateur.findMany({
+        where: { activiteId: req.user.activiteId, role: "TECHNICIEN", actif: true },
+        select: { id: true, nom: true, metier: true },
+      }),
+      // Interventions terminées sur les 7 derniers jours, par technicien
+      prisma.intervention.groupBy({
+        by: ["technicienId"],
+        where: {
+          activiteId: req.user.activiteId,
+          statut: "TERMINEE",
+          technicienId: { not: null },
+          updatedAt: { gte: debutSemaine() },
+        },
+        _count: { _all: true },
+      }),
+      // Charge actuelle : interventions encore en cours ou planifiées, par technicien
+      prisma.intervention.groupBy({
+        by: ["technicienId"],
+        where: {
+          activiteId: req.user.activiteId,
+          statut: { in: ["PLANIFIEE", "EN_COURS"] },
+          technicienId: { not: null },
+        },
+        _count: { _all: true },
+      }),
+      // Note moyenne par technicien
+      prisma.avis.groupBy({
+        by: ["technicienId"],
+        where: { technicien: { activiteId: req.user.activiteId } },
+        _avg: { note: true },
+      }),
+    ]);
+
+    const parId = (liste) => Object.fromEntries(liste.map((l) => [l.technicienId, l]));
+    const termineesParId = parId(terminees);
+    const enCoursParId = parId(enCours);
+    const avisParId = parId(avis);
+
+    classement = techniciens
+      .map((t) => ({
+        id: t.id,
+        nom: t.nom,
+        metier: t.metier,
+        termineesSemaine: termineesParId[t.id]?._count._all ?? 0,
+        chargeActuelle: enCoursParId[t.id]?._count._all ?? 0,
+        noteMoyenne: avisParId[t.id]?._avg.note ? arrondi(avisParId[t.id]._avg.note) : null,
+      }))
+      .sort((a, b) => b.termineesSemaine - a.termineesSemaine);
+
+    // Spécialité la plus demandée : interventions des 30 derniers jours, groupées par métier du technicien attribué
+    const trenteJours = new Date();
+    trenteJours.setDate(trenteJours.getDate() - 30);
+
+    const interventionsRecentes = await prisma.intervention.findMany({
+      where: {
+        activiteId: req.user.activiteId,
+        createdAt: { gte: trenteJours },
+        technicienId: { not: null },
+      },
+      select: { technicien: { select: { metier: true } } },
+    });
+
+    const compteParMetier = {};
+    interventionsRecentes.forEach((i) => {
+      const metier = i.technicien?.metier ?? "Non renseigné";
+      compteParMetier[metier] = (compteParMetier[metier] ?? 0) + 1;
+    });
+
+    const totalInterventions = interventionsRecentes.length;
+    specialites = Object.entries(compteParMetier)
+      .map(([metier, nombre]) => ({
+        metier,
+        nombre,
+        part: totalInterventions ? Math.round((nombre / totalInterventions) * 100) : 0,
+      }))
+      .sort((a, b) => b.nombre - a.nombre);
+  }
+
+
   res.json({
     compteurs,
     total: Object.values(compteurs).reduce((a, b) => a + b, 0),
     prochains,
     facturation,
+    classement,
+    specialites,
   });
 });
