@@ -13,6 +13,14 @@ const schema = z.object({
   depuis: z.coerce.date().optional(),
 });
 
+// Borne de 7 jours glissants pour le mini-classement de la semaine
+function debutSemaine() {
+  const d = new Date();
+  d.setDate(d.getDate() - 7);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 dashboardRouter.get("/", async (req, res) => {
   const { depuis = new Date() } = schema.parse(req.query);
   const base = perimetre(req.user);
