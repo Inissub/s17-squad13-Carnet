@@ -2,6 +2,8 @@
 
 Application de suivi des interventions pour les techniciens et artisans du Congo-Brazzaville : clients, interventions, devis, factures et annuaire public des techniciens avec avis clients.
 
+Lien du projet : https://maboko-carnet.vercel.app/
+
 ## Fonctionnalités
 
 - Landing page et annuaire public des techniciens (profil, réalisations, avis)
